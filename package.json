@@ -1,0 +1,16 @@
+{
+  "name": "validator",
+  "version": "1.0.0",
+  "description": "Wrapped Hive Validator",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "wrapped",
+    "hive",
+    "ethereum"
+  ],
+  "author": "fbslo & ederaleng & ochukochris",
+  "license": "ISC"
+}
