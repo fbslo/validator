@@ -6,6 +6,6 @@ const { hive, ethereum, emitter } = require("./blockchain/index.js")
 
 hive.streamBlockchain()
 
-emitter.on("stakeModifyingOperation", (data) => {
+emitter.on("hiveDeposit", (data) => {
   console.log(1, data)
 })

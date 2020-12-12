@@ -1,11 +1,15 @@
+var users = [] //store users in memory instead of constant db calls
+
 exports.buildMakeHiveInterface = ({ hive, eventEmitter, userDatabase }) => {
   return Object.freeze({
     streamBlockchain
   })
 
-  var users = [] //store users in memory instead of constant db calls
-
-  function streamBlockchain(callback){
+  async function streamBlockchain(callback){
+    if (users.length == 0) {
+      let usersFromDatabase = await userDatabase.findAll()
+      users = usersFromDatabase.map(user => { return user['username'] })
+    }
     hive.stream({
       on_block: checkBlock,
       irreversible: process.env.ENVIRONMENT == "production" ? true : false,
@@ -22,7 +26,7 @@ exports.buildMakeHiveInterface = ({ hive, eventEmitter, userDatabase }) => {
     }
   }
 
-  function routeTransaction(type, data){
+  async function routeTransaction(type, data){
     try {
       switch (type){
         case 'transfer':
@@ -33,8 +37,8 @@ exports.buildMakeHiveInterface = ({ hive, eventEmitter, userDatabase }) => {
           break;
         case 'claim_reward_balance':
         //case 'producer_reward':
+        //case 'withdraw_vesting':
         case 'transfer_to_vesting':
-        // case 'withdraw_vesting':
         case 'fill_vesting_withdraw':
           validateStakeModifyingOperation(type, data);
           break;
@@ -61,10 +65,14 @@ exports.buildMakeHiveInterface = ({ hive, eventEmitter, userDatabase }) => {
   }
 
   function validateCustomJson(data){
-    if (data.id == 'wrapped_hive'){
+    if (data.id == 'wrapped_hive' && data.required_auths[0]){
       let json = JSON.parse(data.json)
       if (!json.type){
         throw new Error("JSON type is required")
+      }
+      if (!users.includes(data.required_auths[0])) {
+        users.push(data.required_auths[0])
+        //// TODO: add to database
       }
       switch (json.type){
         case 'validator_vote':
@@ -90,10 +98,6 @@ exports.buildMakeHiveInterface = ({ hive, eventEmitter, userDatabase }) => {
   }
 
   async function validateStakeModifyingOperation(type, data){
-    if (users.length == 0) {
-      let usersFromDatabase = await userDatabase.findAll()
-      users = usersFromDatabase.map(user => { return user['username'] })
-    }
     switch (type){
       case 'claim_reward_balance':
         if (users.includes(data.account)){
