@@ -2,7 +2,10 @@ var users = [] //store users in memory instead of constant db calls
 
 exports.buildMakeHiveInterface = ({ hive, eventEmitter, userDatabase, getUserStake }) => {
   return Object.freeze({
-    streamBlockchain
+    streamBlockchain,
+    validateTransfer,
+    validateCustomJson,
+    validateStakeModifyingOperation
   })
 
   async function streamBlockchain(callback){
@@ -56,7 +59,7 @@ exports.buildMakeHiveInterface = ({ hive, eventEmitter, userDatabase, getUserSta
       let transferDetails = {
         from: data.from,
         to: data.to,
-        amount: data.amount.split(" ")[0],
+        amount: Number(data.amount.split(" ")[0]),
         currency: data.amount.split(" ")[1],
         memo: data.memo
       }
@@ -74,7 +77,7 @@ exports.buildMakeHiveInterface = ({ hive, eventEmitter, userDatabase, getUserSta
         users.push(data.required_auths[0])
         userDatabase.insert({
           username: data.required_auths[0],
-          stake: await getUserStake(data.required_auths[0]);
+          stake: await getUserStake(data.required_auths[0])
         })
       }
       switch (json.type){
@@ -137,5 +140,11 @@ exports.buildMakeHiveInterface = ({ hive, eventEmitter, userDatabase, getUserSta
       //   }
       //   break;
     }
+  }
+
+  async function getUserStake(user){
+    let accounts = await hive.api('get_accounts', [[user]]);
+    let activeStake = accounts[0].vesting_shares.split(" ")[0] * Math.pow(10, 6) - accounts[0].to_withdraw
+    return activeStake > 0 ? activeStake : 0;
   }
 }

@@ -6,13 +6,7 @@ const { userDatabase } = require("../dataAccess/index.js")
 
 const { buildMakeHiveInterface } = require("./hive.js");
 
-const makeHiveInterface = buildMakeHiveInterface({ hive, eventEmitter, userDatabase, getUserStake })
-
-async function getUserStake(user){
-  let accounts = await hive.api('get_accounts', [[user]]);
-  let activeStake = accounts[0].vesting_shares.split(" ")[0] * Math.pow(10, 6) - accounts[0].to_withdraw
-  return activeStake > 0 ? activeStake : 0;
-}
+const makeHiveInterface = buildMakeHiveInterface({ hive, eventEmitter, userDatabase })
 
 module.exports.hive = makeHiveInterface
 module.exports.emitter = eventEmitter
