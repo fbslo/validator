@@ -31,7 +31,7 @@ exports.makeValidatorsDatabase = ({ makeDb }) => {
     return result.toArray();
   }
 
-  async function remove(username){
+  async function removeByUsername(username){
     const db = await makeDb();
     const result = await db.collection("validators").deleteOne({ username: username });
     return result.modifiedCount > 0 ? true : false
