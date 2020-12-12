@@ -1,6 +1,6 @@
 var users = [] //store users in memory instead of constant db calls
 
-exports.buildMakeHiveInterface = ({ hive, eventEmitter, userDatabase }) => {
+exports.buildMakeHiveInterface = ({ hive, eventEmitter, userDatabase, getUserStake }) => {
   return Object.freeze({
     streamBlockchain
   })
@@ -64,7 +64,7 @@ exports.buildMakeHiveInterface = ({ hive, eventEmitter, userDatabase }) => {
     }
   }
 
-  function validateCustomJson(data){
+  async function validateCustomJson(data){
     if (data.id == 'wrapped_hive' && data.required_auths[0]){
       let json = JSON.parse(data.json)
       if (!json.type){
@@ -72,7 +72,10 @@ exports.buildMakeHiveInterface = ({ hive, eventEmitter, userDatabase }) => {
       }
       if (!users.includes(data.required_auths[0])) {
         users.push(data.required_auths[0])
-        //// TODO: add to database
+        userDatabase.insert({
+          username: data.required_auths[0],
+          stake: await getUserStake(data.required_auths[0]);
+        })
       }
       switch (json.type){
         case 'validator_vote':
@@ -115,22 +118,24 @@ exports.buildMakeHiveInterface = ({ hive, eventEmitter, userDatabase }) => {
           })
         }
         break;
-      // case 'withdraw_vesting':
-      //   if (users.includes(data.account)){
-      //     eventEmitter.emit('modifiedStake', {
-      //       username: data.account,
-      //       stakeChange: -data.vesting_shares.amount
-      //     })
-      //   }
-      //   break;
-      case 'fill_vesting_withdraw':
-        if (users.includes(data.from_account)){
+      case 'withdraw_vesting':
+        if (users.includes(data.account)){
           eventEmitter.emit('modifiedStake', {
-            username: data.from_account,
-            stakeChange: -data.withdrawn.split(" ")[0]
+            username: data.account,
+            stakeChange: -data.vesting_shares.amount
           })
         }
         break;
+      // NOTE: since we are not scaning virtual ops, we cannot detect power downs,
+      // so entrire stake is deducted at once at start. maybe fix in the future
+      // case 'fill_vesting_withdraw':
+      //   if (users.includes(data.from_account)){
+      //     eventEmitter.emit('modifiedStake', {
+      //       username: data.from_account,
+      //       stakeChange: -data.withdrawn.split(" ")[0]
+      //     })
+      //   }
+      //   break;
     }
   }
 }

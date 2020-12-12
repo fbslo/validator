@@ -3,7 +3,7 @@ const { makeValidatorsDatabase } = require("./validators.js")
 const { makeUsersDatabase } = require("./users.js")
 
 const url = process.env.MONGODB_URL
-const client = new MongoClient(url, { useNewUrlParser: true })
+const client = new MongoClient(url, { useNewUrlParser: true, useUnifiedTopology: true  })
 
 const makeDatabase = async () => {
   if (!client.isConnected()) {
