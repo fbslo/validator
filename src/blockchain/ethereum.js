@@ -5,17 +5,15 @@ exports.buildMakeEthereumInterface = ({ web3, eventEmitter, tokenABI }) => {
 
   async function streamEthereumEvents(){
     setInterval(() => {
-      let events = await getEvents();
+      let events = await getERC20TransactionsByEvent();
       eventEmitter.emit("ethereumConversion", events)
-    }, 1000 * )
+    }, 1000 * 60)
   }
 
-  async function get_ERC20_transactions_by_event(){
-    let head_block_number = await web3.eth.getBlockNumber();
-    let last_processed_block = await Globals.query().select("value").where("name", "last_eth_block")
-    let to_block = head_block_number - 12 //wait 12 confirmations
-    let contract = new web3.eth.Contract(tokenABI.abi, process.env.CONTRACT_ADDRESS);
-    let past_events = await contract.getPastEvents("convertToken", {}, { fromBlock: last_processed_block[0].value, toBlock: to_block })
-    return past_events;
+  async function getERC20TransactionsByEvent(){
+    let  = await web3.eth.getBlockNumber();
+    let contract = new web3.eth.Contract(tokenABI, process.env.CONTRACT_ADDRESS);
+    let pastEvents = await contract.getPastEvents("convertToken", {}, { fromBlock: 0, toBlock: headBlock - 12 })
+    return pastEvents;
   }
 }
