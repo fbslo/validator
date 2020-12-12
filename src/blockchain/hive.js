@@ -63,7 +63,7 @@ exports.buildMakeHiveInterface = ({ hive, eventEmitter, userDatabase, getUserSta
         currency: data.amount.split(" ")[1],
         memo: data.memo
       }
-      eventEmitter.emit('hiveDeposit', transferDetails)
+      eventEmitter.emit('hiveConversion', transferDetails)
     }
   }
 
