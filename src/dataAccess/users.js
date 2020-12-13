@@ -16,7 +16,7 @@ exports.makeUsersDatabase = ({ makeDatabase }) => {
 
   async function findByUsername(username){
     const db = await makeDatabase();
-    const result = await db.collection("users").find({ username });
+    const result = await db.collection("users").findOne({ username: username });
     return result.toArray();
   }
 
