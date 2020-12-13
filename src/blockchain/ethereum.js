@@ -11,7 +11,7 @@ exports.buildMakeEthereumInterface = ({ web3, eventEmitter, tokenABI }) => {
   }
 
   async function getERC20TransactionsByEvent(){
-    let = await web3.eth.getBlockNumber();
+    let headBlock = await web3.eth.getBlockNumber();
     let contract = new web3.eth.Contract(tokenABI, process.env.CONTRACT_ADDRESS);
     let pastEvents = await contract.getPastEvents("convertToken", {}, { fromBlock: 0, toBlock: headBlock - 12 })
     return pastEvents;

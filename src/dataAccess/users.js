@@ -3,7 +3,7 @@ exports.makeUsersDatabase = ({ makeDatabase }) => {
     findAll,
     findByUsername,
     updateByUsername,
-    updateStakeByusername,
+    updateStakeByUsername,
     insert,
     removeByUsername
   })
@@ -26,7 +26,7 @@ exports.makeUsersDatabase = ({ makeDatabase }) => {
     return result.modifiedCount > 0 ? true : false
   }
 
-  async function updateStakeByusername(username, stake){
+  async function updateStakeByUsername(username, stake){
     const db = await makeDatabase();
     const result = await db.collection("users").updateOne({ username: username }, { $set: { stake: stake } });
     return result.modifiedCount > 0 ? true : false

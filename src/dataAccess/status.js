@@ -1,11 +1,10 @@
 exports.makeStatusDatabase = ({ makeDatabase }) => {
   return Object.freeze({
     findAll,
-    findByUsername,
-    updateByUsername,
-    updateStakeByusername,
+    findByName,
+    updateByName,
     insert,
-    removeByUsername
+    removeByName
   })
 
   async function findAll(){
