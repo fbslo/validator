@@ -4,7 +4,7 @@ exports.buildMakeEthereumInterface = ({ web3, eventEmitter, tokenABI }) => {
   })
 
   async function streamEthereumEvents(){
-    setInterval(() => {
+    setInterval(async () => {
       let events = await getERC20TransactionsByEvent();
       eventEmitter.emit("ethereumConversion", events)
     }, 1000 * 60)

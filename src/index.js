@@ -1,7 +1,5 @@
 require('dotenv').config();
-const EventEmitter = require('events');
-const eventEmitter = new EventEmitter();
-
+const { p2p } = require("./p2p/index.js")
 const { hive, ethereum, emitter } = require("./blockchain/index.js")
 
 hive.streamBlockchain()

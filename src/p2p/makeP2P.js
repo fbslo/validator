@@ -1,3 +1,5 @@
+var sockets = []
+
 exports.makeP2P = ({ socket, socketClient }) => {
   return Object.freeze({
     listen,
@@ -5,23 +7,25 @@ exports.makeP2P = ({ socket, socketClient }) => {
     sendEventByName
   })
 
-  const sockets = []
-
   async function listen(server){
     const wss = socket(server)
-    wss.on("connection", (socket) => connectSocket(socket))
+    wss.on("connection", (socket) => socketConnected(socket))
     wss.on("error", (error) => console.log(`Error in ws server: ${error}`))
   }
 
-  async function connectSocket(socket){
+  async function socketConnected(socket){
     sockets.push(socket)
     eventListeners(socket)
     console.log(`New socket connected: ${socket.id}`)
   }
 
-  async function disconnectSocket(socket){
+  async function socketDisconnected(socket){
     sockets = sockets.filter(s => s.id !== socket.id)
     console.log(`Socket ${socket.id} disconected`)
+  }
+
+  async function eventListeners(){
+    // TODO: add event listener
   }
 
   async function getConnectedPeers(){
