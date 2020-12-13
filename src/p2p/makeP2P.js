@@ -1,16 +1,33 @@
 var sockets = []
+var isServerListening = false
 
-exports.makeP2P = ({ socket, socketClient }) => {
+exports.makeP2P = ({ io, ioClient, server }) => {
   return Object.freeze({
     listen,
-    getConnectedPeers,
+    getConnectedNodes,
     sendEventByName
   })
 
-  async function listen(server){
-    const wss = socket(server)
+  async function startServer(){
+    return new Promise((resolve, reject)  => {
+      if (!isServerListening){
+        server.listen(process.env.PORT, () => {
+          console.log(`Server started at port: ${process.env.PORT}`)
+          isServerListening = true
+          resolve(server)
+        });
+      } else {
+        resolve(server)
+      }
+    })
+  }
+
+  async function listen(){
+    const createServer = await startServer()
+    const wss = io(createServer)
     wss.on("connection", (socket) => socketConnected(socket))
     wss.on("error", (error) => console.log(`Error in ws server: ${error}`))
+    connectToNodes()
   }
 
   async function socketConnected(socket){
@@ -24,11 +41,21 @@ exports.makeP2P = ({ socket, socketClient }) => {
     console.log(`Socket ${socket.id} disconected`)
   }
 
-  async function eventListeners(){
-    // TODO: add event listener
+  async function eventListeners(socket){
+    // TODO: add event listeners
   }
 
-  async function getConnectedPeers(){
+  async function connectToNodes(){
+    let nodes = [{address: '127.0.0.1'}] //get validators from database
+    nodes.forEach(node => {
+      const socket = ioClient("http://"+node.address, {
+        transports: ['websocket']
+      });
+      socket.on('connect', () => socketConnected(socket));
+    })
+  }
+
+  async function getConnectedNodes(){
     return sockets;
   }
 
