@@ -1,5 +1,6 @@
 var sockets = []
 var isServerListening = false
+var blacklist = ['127.0.0.1']
 
 exports.makeP2P = ({ io, ioClient, server }) => {
   return Object.freeze({
@@ -8,32 +9,26 @@ exports.makeP2P = ({ io, ioClient, server }) => {
     sendEventByName
   })
 
-  async function startServer(){
-    return new Promise((resolve, reject)  => {
-      if (!isServerListening){
-        server.listen(process.env.PORT, () => {
-          console.log(`Server started at port: ${process.env.PORT}`)
-          isServerListening = true
-          resolve(server)
-        });
-      } else {
-        resolve(server)
-      }
-    })
-  }
-
   async function listen(){
-    const createServer = await startServer()
-    const wss = io(createServer)
+    const wss = io(server)
     wss.on("connection", (socket) => socketConnected(socket))
     wss.on("error", (error) => console.log(`Error in ws server: ${error}`))
     connectToNodes()
   }
 
   async function socketConnected(socket){
+    if (blacklist.includes(socket.handshake.address.split(":").slice(-1)[0])) {
+      disconnectSocket(socket)
+      return;
+    }
     sockets.push(socket)
     eventListeners(socket)
     console.log(`New socket connected: ${socket.id}`)
+  }
+
+  async function disconnectSocket(socket){
+    socket.disconnect();
+    console.log(`Connection from blacklisted socket ${socket.id} rejected.`)
   }
 
   async function socketDisconnected(socket){
