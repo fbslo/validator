@@ -1,8 +1,8 @@
 var sockets = []
 var isServerListening = false
-var blacklist = ['127.0.0.1']
+var blacklist = []
 
-exports.makeP2P = ({ io, ioClient, server }) => {
+exports.makeP2P = ({ io, ioClient, server, validatorDatabase }) => {
   return Object.freeze({
     listen,
     getConnectedNodes,
@@ -38,10 +38,13 @@ exports.makeP2P = ({ io, ioClient, server }) => {
 
   async function eventListeners(socket){
     // TODO: add event listeners
+    socket.on("message", (data) => {
+      console.log(data, 'from', socket.handshake.address.split(":").slice(-1)[0])
+    })
   }
 
   async function connectToNodes(){
-    let nodes = [{address: '127.0.0.1'}] //get validators from database
+    let nodes = await validatorDatabase.findAllAddresses()
     nodes.forEach(node => {
       const socket = ioClient("http://"+node.address, {
         transports: ['websocket']

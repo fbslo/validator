@@ -4,7 +4,8 @@ exports.makeValidatorsDatabase = ({ makeDatabase }) => {
     findByUsername,
     updateByUsername,
     insert,
-    removeByUsername
+    removeByUsername,
+    findAllAddresses
   })
 
   async function findAll(){
@@ -35,5 +36,11 @@ exports.makeValidatorsDatabase = ({ makeDatabase }) => {
     const db = await makeDatabase();
     const result = await db.collection("validators").deleteOne({ username: username });
     return result.modifiedCount > 0 ? true : false
+  }
+
+  async function findAllAddresses(){
+    let allValidators = await findAll();
+    let addresses = allValidators.map(validator => { return validator["address"] })
+    return addresses;
   }
 }
