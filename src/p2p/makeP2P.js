@@ -1,8 +1,9 @@
 var sockets = []
 var isServerListening = false
 var blacklist = []
+var acceptDuplicates = process.env.ENVIRONMENT == 'test' ? true : false
 
-exports.makeP2P = ({ io, ioClient, server, validatorDatabase }) => {
+exports.makeP2P = ({ io, ioClient, server, validatorDatabase, eventEmitter }) => {
   return Object.freeze({
     listen,
     getConnectedNodes,
@@ -17,7 +18,9 @@ exports.makeP2P = ({ io, ioClient, server, validatorDatabase }) => {
   }
 
   async function socketConnected(socket){
-    if (blacklist.includes(socket.handshake.address.split(":").slice(-1)[0])) {
+    let socketIP = socket.handshake.address.split(":").slice(-1)[0]
+    let connectedIPs = sockets.map(socket => { return socket.handshake.address.split(":").slice(-1)[0] })
+    if (blacklist.includes(socketIP) || connectedIPs.includes(socketIP) && !acceptDuplicates) {
       disconnectSocket(socket)
       return;
     }
@@ -28,7 +31,7 @@ exports.makeP2P = ({ io, ioClient, server, validatorDatabase }) => {
 
   async function disconnectSocket(socket){
     socket.disconnect();
-    console.log(`Connection from blacklisted socket ${socket.id} rejected.`)
+    console.log(`Connection from blacklisted/duplicated socket ${socket.id} rejected.`)
   }
 
   async function socketDisconnected(socket){
@@ -37,9 +40,15 @@ exports.makeP2P = ({ io, ioClient, server, validatorDatabase }) => {
   }
 
   async function eventListeners(socket){
-    // TODO: add event listeners
-    socket.on("message", (data) => {
-      console.log(data, 'from', socket.handshake.address.split(":").slice(-1)[0])
+    let onevent = socket.onevent; //create wildcard to catch all custom events
+    socket.onevent = function (packet) {
+        var args = packet.data || [];
+        onevent.call(this, packet); // original call
+        packet.data = ["*"].concat(args);
+        onevent.call(this, packet); // additional call to catch-all
+    };
+    socket.on("*", (event, data) => {
+      // TODO: loop through events and emit events
     })
   }
 
