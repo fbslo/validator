@@ -5,7 +5,8 @@ exports.buildMakeHiveInterface = ({ hive, eventEmitter, userDatabase, getUserSta
     streamBlockchain,
     validateTransfer,
     validateCustomJson,
-    validateStakeModifyingOperation
+    validateStakeModifyingOperation,
+    getTransactionByID
   })
 
   async function streamBlockchain(callback){
@@ -146,5 +147,11 @@ exports.buildMakeHiveInterface = ({ hive, eventEmitter, userDatabase, getUserSta
     let accounts = await hive.api('get_accounts', [[user]]);
     let activeStake = accounts[0].vesting_shares.split(" ")[0] * Math.pow(10, 6) - accounts[0].to_withdraw
     return activeStake > 0 ? activeStake : 0;
+  }
+
+  async function getTransactionByID(id){
+    let call = await hive.api('get_transaction', [id]);
+    if (!call.operations || !call.transaction_id || !call.block_num) return false;
+    return transaction;
   }
 }

@@ -1,6 +1,7 @@
 exports.buildMakeEthereumInterface = ({ web3, eventEmitter, tokenABI }) => {
   return Object.freeze({
-    streamEthereumEvents
+    streamEthereumEvents,
+    getTransaction
   })
 
   async function streamEthereumEvents(){
@@ -15,5 +16,10 @@ exports.buildMakeEthereumInterface = ({ web3, eventEmitter, tokenABI }) => {
     let contract = new web3.eth.Contract(tokenABI, process.env.CONTRACT_ADDRESS);
     let pastEvents = await contract.getPastEvents("convertToken", {}, { fromBlock: 0, toBlock: headBlock - 12 })
     return pastEvents;
+  }
+
+  async function getTransaction(transactionHash){
+    let transaction = web3.eth.getTransaction(transactionHash)
+    return transaction;
   }
 }

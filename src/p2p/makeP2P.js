@@ -21,7 +21,7 @@ exports.makeP2P = ({ io, ioClient, server, validatorDatabase, p2pEventsHandler }
     let socketIP = socket.handshake.address.split(":").slice(-1)[0]
     let connectedIPs = sockets.map(socket => { return socket.handshake.address.split(":").slice(-1)[0] })
     if (blacklist.includes(socketIP) || connectedIPs.includes(socketIP) && !acceptDuplicates) {
-      disconnectSocket(socket)
+      rejectBlacklisted(socket)
       return;
     }
     sockets.push(socket)
@@ -29,7 +29,7 @@ exports.makeP2P = ({ io, ioClient, server, validatorDatabase, p2pEventsHandler }
     console.log(`New socket connected: ${socket.id}`)
   }
 
-  async function disconnectSocket(socket){
+  async function rejectBlacklisted(socket){
     socket.disconnect();
     console.log(`Connection from blacklisted/duplicated socket ${socket.id} rejected.`)
   }

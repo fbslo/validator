@@ -52,7 +52,7 @@ JSON type:
 
 P2P events:
 
-`requestHiveToWhiveConversionSiganture`
+`requestHiveToWrappedConversionSiganture`
 
 {
   referenceTransaction: ref_tx,
@@ -60,7 +60,7 @@ P2P events:
   timestamp: timestamp
 }
 
-`requestWhiveToHiveConversionSiganture`
+`requestWrappedToHiveConversionSiganture`
 
 {
   referenceTransaction: ref_tx,

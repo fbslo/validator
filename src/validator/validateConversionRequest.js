@@ -1,4 +1,4 @@
-module.exports.buildMakeValidateConversionRequest = ({ hash, transactions }) => {
+module.exports.buildMakeValidateConversionRequest = ({ hive, ethereum }) => {
   return async function makeValidateConversionRequest({
     conversionDirection,
     referenceTransaction,
