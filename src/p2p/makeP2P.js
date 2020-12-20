@@ -3,7 +3,7 @@ var isServerListening = false
 var blacklist = []
 var acceptDuplicates = process.env.ENVIRONMENT == 'test' ? true : false
 
-exports.makeP2P = ({ io, ioClient, server, validatorDatabase, eventEmitter }) => {
+exports.makeP2P = ({ io, ioClient, server, validatorDatabase, p2pEventsHandler }) => {
   return Object.freeze({
     listen,
     getConnectedNodes,
@@ -48,7 +48,7 @@ exports.makeP2P = ({ io, ioClient, server, validatorDatabase, eventEmitter }) =>
         onevent.call(this, packet); // additional call to catch-all
     };
     socket.on("*", (event, data) => {
-      // TODO: loop through events and emit events
+      p2pEventsHandler(event, data)
     })
   }
 

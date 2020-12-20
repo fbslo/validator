@@ -49,3 +49,36 @@ JSON type:
 
 
 ---
+
+P2P events:
+
+`requestHiveToWhiveConversionSiganture`
+
+{
+  referenceTransaction: ref_tx,
+  transaction: tx,
+  timestamp: timestamp
+}
+
+`requestWhiveToHiveConversionSiganture`
+
+{
+  referenceTransaction: ref_tx,
+  transaction: tx,
+  timestamp: timestamp
+}
+
+`sharePeerList`
+
+No incoming data
+
+`heartbeat`
+
+No incoming data
+
+`requestPeerSiganture`
+
+{
+  referenceTransaction: ref_tx,
+  peerUsername: 'fbslo'
+}

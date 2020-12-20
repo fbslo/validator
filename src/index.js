@@ -15,3 +15,6 @@ p2p.listen()
 // emitter.on("ethereumConversion", (data) => {
 //   console.log('emmited event', data)
 // })
+eventEmitter.on("message", (data) => {
+  console.log('emmited message event', data)
+})
