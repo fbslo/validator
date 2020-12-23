@@ -1,7 +1,8 @@
-exports.buildMakeEthereumInterface = ({ web3, eventEmitter, tokenABI }) => {
+exports.buildMakeEthereumInterface = ({ web3, eventEmitter, tokenABI, inputDataDecoder }) => {
   return Object.freeze({
     streamEthereumEvents,
-    getTransaction
+    getTransaction,
+    decode
   })
 
   async function streamEthereumEvents(){
@@ -20,6 +21,13 @@ exports.buildMakeEthereumInterface = ({ web3, eventEmitter, tokenABI }) => {
 
   async function getTransaction(transactionHash){
     let transaction = web3.eth.getTransaction(transactionHash)
+    // TODO: prepare definde structure of response
     return transaction;
+  }
+
+  async function decode(input){
+    let decodedInput = inputDataDecoder.decodeData(input);
+    // TODO: standarize output
+    return decodedInput;
   }
 }

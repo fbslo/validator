@@ -1,22 +1,19 @@
-module.exports.buildMakeValidateConversionRequest = ({ hive, ethereum }) => {
-  return async function makeValidateConversionRequest({
+module.exports.buildMakeValidateConversionRequest = ({ hive, ethereum, transactionDatabase, isValidHash }) => {
+  return async function makeValidateConversionRequest(
     conversionDirection,
     referenceTransaction,
     proposedTransaction,
     createdOn = Date.now(),
     updatedOn = Date.now()
-  }){
+  ){
     if (!conversionDirection){
       throw new Error(`Conversion direction is required`)
     }
-    if (conversionDirection != 'hive' || conversionDirection != 'ethereum'){
+    if (conversionDirection != 'hive' && conversionDirection != 'ethereum'){
       throw new Error(`Conversion direction must be hive or ethereum`)
     }
     if (!referenceTransaction){
       throw new Error(`Reference transaction is required`)
-    }
-    if (!hash.isValid(referenceTransaction)){
-      throw new Error(`Reference transaction must be valid`)
     }
     if (!proposedTransaction || proposedTransaction.length < 1){
       throw new Error(`Proposed transaction is required`)
@@ -24,19 +21,52 @@ module.exports.buildMakeValidateConversionRequest = ({ hive, ethereum }) => {
     if (typeof referenceTransaction != 'string'){
       throw new Error(`Reference transaction must be a string`)
     }
-
-    let isTransactionValid;
-    if (conversionDirection == 'hive'){
-      isTransactionValid = await validateConversionToHive(referenceTransaction, transaction)
-    } else {
-      isTransactionValid = await validateConversionToEthereum(referenceTransaction, transaction)
+    if (typeof proposedTransaction != 'object' && typeof proposedTransaction != 'string'){
+      throw new Error(`Proposed transaction must be object or string`)
     }
 
-    return isTransactionValid;
+    let signedTransaction = false;
+    try {
+      if (conversionDirection == 'hive'){
+        signedTransaction = await validateConversionToHive(referenceTransaction, proposedTransaction)
+      } else {
+        signedTransaction = await validateConversionToEthereum(referenceTransaction, proposedTransaction)
+      }
+    } catch (e) {
+      console.log(`signedTransaction failed or rejected: ${e.message}`)
+    }
+
+    return signedTransaction;
   }
 
   async function validateConversionToHive(referenceTransaction, transaction){
     if (typeof transaction == 'string') transaction = JSON.parse(transaction)
-    // TODO: compare tx
+    let ethereumTransaction = await ethereum.getTransaction(referenceTransaction);
+    let decodedTransactionData = await ethereum.decode(ethereumTransaction.input)
+
+    if (ethereumTransaction.to.toLowerCase() != process.env.CONTRACT_ADDRESS){
+      throw new Error(`Transaction must be to selected smart contract`)
+    }
+    if (decodedTransactionData.method != process.env.CONTRACT_METHOD){
+      throw new Error(`Method must be ${process.env.CONTRACT_METHOD}`)
+    }
+    if (transaction.operations[0][0] != 'transfer'){
+      throw new Error(`Transaction operation must be transfer`)
+    }
+    if (decodedTransactionData.inputs[0].toString() != transaction.operations[0][1].amount.split(" ")[0]){
+      throw new Error(`Amount burned must match proposed amount`)
+    }
+    if (transaction.operations[0][1].amount.split(" ")[1] != 'HIVE'){
+      throw new Error(`Proposed transfer currency must be HIVE`)
+    }
+    if (decoded_tx.inputs[1] != transaction.operations[0][1].to){
+      throw new Error(`Address from burn transaction must match proposed recepient`)
+    }
+    // TODO: sign transaction
+    let signedTransaction = await hive.sign(transaction);
+  }
+
+  async function validateConversionToEthereum(referenceTransaction, transaction){
+    // TODO:
   }
 }

@@ -1,6 +1,6 @@
 var users = [] //store users in memory instead of constant db calls
 
-exports.buildMakeHiveInterface = ({ hive, eventEmitter, userDatabase, getUserStake }) => {
+exports.buildMakeHiveInterface = ({ hive, eventEmitter, userDatabase, getUserStake, dHive }) => {
   return Object.freeze({
     streamBlockchain,
     validateTransfer,
@@ -152,6 +152,19 @@ exports.buildMakeHiveInterface = ({ hive, eventEmitter, userDatabase, getUserSta
   async function getTransactionByID(id){
     let call = await hive.api('get_transaction', [id]);
     if (!call.operations || !call.transaction_id || !call.block_num) return false;
+    let transaction = {
+      operations: call.operations,
+      transaction_id: call.transaction_id,
+      block_num: call.block_num
+    }
     return transaction;
+  }
+
+  async function sign(rawTransaction){
+    let dHiveClient =  new dhive.Client(process.env.HIVE_NODES.split(','), {
+      chainId: process.env.HIVE_CHAIN_ID,
+    })
+    let signedTransaction = await dHiveClient.sign(rawTransaction, dhive.PrivateKey.from(process.env.ACTIVE_HIVE_KEY));
+    return signedTransaction;
   }
 }
