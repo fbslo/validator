@@ -22,7 +22,7 @@ exports.makeUsersDatabase = ({ makeDatabase }) => {
 
   async function updateByUsername(username, data){
     const db = await makeDatabase();
-    const result = await db.collection("users").updateOne({ username: username }, { $set: { data } });
+    const result = await db.collection("users").updateOne({ username: username }, { $set: { data: data } });
     return result.modifiedCount > 0 ? true : false
   }
 

@@ -21,7 +21,7 @@ exports.makeTransactionsDatabase = ({ makeDatabase }) => {
 
   async function updateByReferenceID(id, data){
     const db = await makeDatabase();
-    const result = await db.collection("transactions").updateOne({ referenceTransaction: id }, { $set: { data } });
+    const result = await db.collection("transactions").updateOne({ referenceTransaction: id }, { $set: { data: data } });
     return result.modifiedCount > 0 ? true : false
   }
 

@@ -1,20 +1,20 @@
-const { eventEmitter } = require("../eventEmitter/index.js")
+const { eventEmitter } = require("../eventHandler/index.js")
 const { statusDatabase } = require("../dataAccess/index.js")
 const { hive } = require('../blockchain/index.js')
 
-eventEmitter.on(`switchHeadValidator`, async (data) => {
-  let scheduleNumber = await getScheduleNumber(data.headBlock)
-  let newHeadValidator = await getNewHeadValidator(scheduleNumber)
-  console.log(newHeadValidator)
-  let saveNewHeadValidator = await statusDatabase.insert({
-    name: 'headValidator',
-    username: newHeadValidator
+async function listen(){
+  console.log("Listening to governance...")
+  eventEmitter.on(`switchHeadValidator`, async (data) => {
+    let scheduleNumber = await getScheduleNumber(data.headBlock)
+    let newHeadValidator = await getNewHeadValidator(scheduleNumber)
+    console.log(newHeadValidator)
+    let saveNewHeadValidator = await statusDatabase.updateByName(`headValidator`, newHeadValidator)
   })
-})
+}
 
 async function getScheduleNumber(headBlock){
-  let auths = await get_auths()
-  let n = auths.account_auths.length + auths.key_auths.length
+  let accountDetails = await hive.getAccount(process.env.HIVE_DEPOSIT_ACCOUNT)
+  let n = accountDetails.active.account_auths.length + accountDetails.active.key_auths.length
   let blockHash = await hive.getBlockHash(headBlock)
   let scheduleNumber = parseInt(blockHash, 16) % n
   return scheduleNumber;
@@ -23,6 +23,8 @@ async function getScheduleNumber(headBlock){
 async function getNewHeadValidator(scheduleNumber){
   let accountDetails = await hive.getAccount(process.env.HIVE_DEPOSIT_ACCOUNT)
   if (scheduleNumber == 0) scheduleNumber = 1
-  let validator = accountDetails.auths.account_auths[scheduleNumber - 1]
-  return validator;
+  let validator = accountDetails.active.account_auths[scheduleNumber - 1]
+  return validator[0];
 }
+
+module.exports.listen = listen
