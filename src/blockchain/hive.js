@@ -10,7 +10,8 @@ exports.buildMakeHiveInterface = ({ hive, eventEmitter, userDatabase, getUserSta
     getBlockHash,
     getAccount,
     sign,
-    broadcast
+    broadcast,
+    prepareTransferTransaction
   })
 
   async function streamBlockchain(callback){
@@ -191,5 +192,28 @@ exports.buildMakeHiveInterface = ({ hive, eventEmitter, userDatabase, getUserSta
     })
     let sendSignedTransaction = await dhiveClient.broadcast.send(signedTransaction);
     return sendSignedTransaction;
+  }
+
+  async function prepareTransferTransaction({ from, to, amount, currency, memo}){
+    currency == 'HDB' ? 'HBD' : "HIVE"
+    let expireTime = 1000 * 3590;
+    let props = await client.database.getDynamicGlobalProperties();
+    let ref_block_num = props.head_block_number & 0xFFFF;
+    let ref_block_prefix = Buffer.from(props.head_block_id, 'hex').readUInt32LE(4);
+    let expiration = new Date(Date.now() + expireTime).toISOString().slice(0, -5);
+    let extensions = [];
+    let operations = [['transfer',
+     {'amount': `${parseFloat(amount).toFixed(3)} ${currency}`,
+      'from': from,
+      'memo': memo,
+      'to': to}]];
+    let tx = {
+      expiration,
+      extensions,
+      operations,
+      ref_block_num,
+      ref_block_prefix
+    }
+    return tx;
   }
 }
