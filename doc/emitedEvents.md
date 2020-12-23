@@ -1,4 +1,4 @@
-hiveDeposit
+`hiveDeposit`
 
 {
   from: data.from,
@@ -10,7 +10,7 @@ hiveDeposit
 
 ---
 
-validatorVote
+`validatorVote`
 
 {
   validator: json.validator,
@@ -19,19 +19,35 @@ validatorVote
 
 ---
 
-validator_update
+`validator_update`
 
 ---
 
-validator_creation
+`validator_creation`
 
 ---
 
-modifiedStake
+`modifiedStake`
 
 {
   username: data.from_account,
   stakeChange: -data.withdrawn.split(" ")[0]
+}
+
+---
+
+`switchHeadValidator`
+
+{
+  headBlock: head_num
+}
+
+---
+
+`heartbeat`
+
+{
+  headBlock: head_num
 }
 
 ---

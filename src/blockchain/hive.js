@@ -7,6 +7,8 @@ exports.buildMakeHiveInterface = ({ hive, eventEmitter, userDatabase, getUserSta
     validateCustomJson,
     validateStakeModifyingOperation,
     getTransactionByID,
+    getBlockHash,
+    getAccount,
     sign,
     broadcast
   })
@@ -23,6 +25,9 @@ exports.buildMakeHiveInterface = ({ hive, eventEmitter, userDatabase, getUserSta
   }
 
   async function checkBlock(block_num, block){
+    if (block_num % 5000) eventEmitter.emit(`switchHeadValidator`, { headBlock: block_num })
+    if (block.last_block % 1000 === 0 && block.last_block % 5000 != 0) eventEmitter.emit(`heartbeat`, { headBlock: block_num })
+
     for (const transaction of block.transactions) {
       for (const op of transaction.operations){
         let type = op[0]
@@ -160,6 +165,16 @@ exports.buildMakeHiveInterface = ({ hive, eventEmitter, userDatabase, getUserSta
       block_num: call.block_num
     }
     return transaction;
+  }
+
+  async function getBlockHash(number){
+    let block = await hive.api('get_block', [id]);
+    return block.block_id;
+  }
+
+  async function getAccount(account){
+    let accountDetails = await hive.api('get_accounts', [account]);
+    return accountDetails[0];
   }
 
   async function sign(rawTransaction){

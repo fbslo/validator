@@ -5,7 +5,7 @@ const { hive, ethereum } = require("./blockchain/index.js")
 
 p2p.listen()
 
-// hive.streamBlockchain()
+hive.streamBlockchain()
 // ethereum.streamEthereumEvents()
 //
 // emitter.on("hiveConversion", (data) => {
@@ -15,6 +15,3 @@ p2p.listen()
 // emitter.on("ethereumConversion", (data) => {
 //   console.log('emmited event', data)
 // })
-eventEmitter.on("message", (data) => {
-  console.log('emmited message event', data)
-})

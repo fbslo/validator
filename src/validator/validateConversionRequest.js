@@ -62,7 +62,6 @@ module.exports.buildMakeValidateConversionRequest = ({ hive, ethereum, transacti
     if (decodedTransactionData.inputs[1] != transaction.operations[0][1].to){
       throw new Error(`Address from burn transaction must match proposed recepient`)
     }
-    // TODO: sign transaction
     let signedTransaction = await hive.sign(transaction);
     return signedTransaction;
   }
