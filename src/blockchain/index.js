@@ -1,5 +1,5 @@
 const { Hive } = require('@splinterlands/hive-interface');
-const dHive = require('@hiveio/dhive');
+const dhive = require('@hiveio/dhive');
 const Web3 = require('web3');
 const InputDataDecoder = require('ethereum-input-data-decoder');
 
@@ -14,7 +14,7 @@ const inputDataDecoder = new InputDataDecoder(tokenABI);
 const { buildMakeHiveInterface } = require("./hive.js");
 const { buildMakeEthereumInterface } = require("./ethereum.js");
 
-const makeHiveInterface = buildMakeHiveInterface({ hive, eventEmitter, userDatabase, dHive })
+const makeHiveInterface = buildMakeHiveInterface({ hive, eventEmitter, userDatabase, dhive })
 const makeEthereumInterface = buildMakeEthereumInterface({ web3, eventEmitter, tokenABI, inputDataDecoder })
 
 module.exports.hive = makeHiveInterface

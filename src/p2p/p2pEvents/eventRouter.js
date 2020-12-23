@@ -1,12 +1,13 @@
 const { validator } = require("../../validator/index.js")
+const { hive } = require("../../blockchain/index.js")
 
-const p2pEventsHandler = (event, data) => {
+const p2pEventsHandler = async (event, data) => {
   try {
     switch (event){
       case "requestHiveToWrappedConversionSiganture":
         break;
       case "requestWrappedToHiveConversionSiganture":
-        validator(`hive`, data.referenceTransaction, data.transaction)
+        let signature = await validator(`hive`, data.referenceTransaction, data.transaction);
         break;
       case "sharePeerList":
         break;
@@ -16,7 +17,7 @@ const p2pEventsHandler = (event, data) => {
         break;
     }
   } catch (e) {
-    console.log(`P2P event failed or rejected: ${e.name}`)
+    console.log(`P2P event failed or rejected: ${e}`)
   }
 }
 

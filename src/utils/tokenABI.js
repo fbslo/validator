@@ -162,7 +162,26 @@ exports.tokenABI = [
         "type": "string"
       }
     ],
-    "name": "convertToken",
+    "name": "convertTokenEvent",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "referenceTransaction",
+        "type": "string"
+      }
+    ],
+    "name": "mintTokenEvent",
     "type": "event"
   },
   {
@@ -272,6 +291,26 @@ exports.tokenABI = [
     "constant": false,
     "inputs": [
       {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "username",
+        "type": "string"
+      }
+    ],
+    "name": "convertToken",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
         "internalType": "address",
         "name": "account",
         "type": "address"
@@ -287,47 +326,7 @@ exports.tokenABI = [
         "type": "string"
       }
     ],
-    "name": "convertTokenFromWithBurn",
-    "outputs": [],
-    "payable": false,
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "constant": false,
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      },
-      {
-        "internalType": "string",
-        "name": "username",
-        "type": "string"
-      }
-    ],
-    "name": "convertTokenWithBurn",
-    "outputs": [],
-    "payable": false,
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "constant": false,
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      },
-      {
-        "internalType": "string",
-        "name": "username",
-        "type": "string"
-      }
-    ],
-    "name": "convertTokenWithTransfer",
+    "name": "convertTokenFrom",
     "outputs": [],
     "payable": false,
     "stateMutability": "nonpayable",
@@ -479,6 +478,31 @@ exports.tokenABI = [
         "type": "bool"
       }
     ],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "referenceTransaction",
+        "type": "string"
+      }
+    ],
+    "name": "mintToken",
+    "outputs": [],
     "payable": false,
     "stateMutability": "nonpayable",
     "type": "function"

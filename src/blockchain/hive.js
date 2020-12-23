@@ -1,12 +1,14 @@
 var users = [] //store users in memory instead of constant db calls
 
-exports.buildMakeHiveInterface = ({ hive, eventEmitter, userDatabase, getUserStake, dHive }) => {
+exports.buildMakeHiveInterface = ({ hive, eventEmitter, userDatabase, getUserStake, dhive }) => {
   return Object.freeze({
     streamBlockchain,
     validateTransfer,
     validateCustomJson,
     validateStakeModifyingOperation,
-    getTransactionByID
+    getTransactionByID,
+    sign,
+    broadcast
   })
 
   async function streamBlockchain(callback){
@@ -161,10 +163,18 @@ exports.buildMakeHiveInterface = ({ hive, eventEmitter, userDatabase, getUserSta
   }
 
   async function sign(rawTransaction){
-    let dHiveClient =  new dhive.Client(process.env.HIVE_NODES.split(','), {
+    let dhiveClient = new dhive.Client(process.env.HIVE_NODES.split(','), {
       chainId: process.env.HIVE_CHAIN_ID,
     })
-    let signedTransaction = await dHiveClient.sign(rawTransaction, dhive.PrivateKey.from(process.env.ACTIVE_HIVE_KEY));
+    let signedTransaction = await dhiveClient.broadcast.sign(rawTransaction, dhive.PrivateKey.from(process.env.ACTIVE_HIVE_KEY));
     return signedTransaction;
+  }
+
+  async function broadcast(signedTransaction){
+    let dhiveClient = new dhive.Client(process.env.HIVE_NODES.split(','), {
+      chainId: process.env.HIVE_CHAIN_ID,
+    })
+    let sendSignedTransaction = await dhiveClient.broadcast.send(signedTransaction);
+    return sendSignedTransaction;
   }
 }

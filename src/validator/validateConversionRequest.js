@@ -53,17 +53,18 @@ module.exports.buildMakeValidateConversionRequest = ({ hive, ethereum, transacti
     if (transaction.operations[0][0] != 'transfer'){
       throw new Error(`Transaction operation must be transfer`)
     }
-    if (decodedTransactionData.inputs[0].toString() != transaction.operations[0][1].amount.split(" ")[0]){
+    if (decodedTransactionData.inputs[0].toString() / Math.pow(10, process.env.ETHEREUM_TOKEN_PRECISION) != transaction.operations[0][1].amount.split(" ")[0]){
       throw new Error(`Amount burned must match proposed amount`)
     }
     if (transaction.operations[0][1].amount.split(" ")[1] != 'HIVE'){
       throw new Error(`Proposed transfer currency must be HIVE`)
     }
-    if (decoded_tx.inputs[1] != transaction.operations[0][1].to){
+    if (decodedTransactionData.inputs[1] != transaction.operations[0][1].to){
       throw new Error(`Address from burn transaction must match proposed recepient`)
     }
     // TODO: sign transaction
     let signedTransaction = await hive.sign(transaction);
+    return signedTransaction;
   }
 
   async function validateConversionToEthereum(referenceTransaction, transaction){
