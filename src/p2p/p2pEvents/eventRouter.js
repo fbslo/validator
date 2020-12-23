@@ -15,6 +15,8 @@ const p2pEventsHandler = async (event, data) => {
         break;
       case "requestPeerSiganture":
         break;
+      case "shareSignature":
+        break;
     }
   } catch (e) {
     console.log(`P2P event failed or rejected: ${e}`)
