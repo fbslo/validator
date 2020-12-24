@@ -34,8 +34,8 @@ exports.makeUsersDatabase = ({ makeDatabase }) => {
 
   async function insert(data){
     const db = await makeDatabase();
-    const result = await db.collection("users").insert({ data });
-    return result.toArray();
+    const result = await db.collection("users").insertOne({ data });
+    return result.modifiedCount > 0 ? true : false
   }
 
   async function removeByUsername(username){

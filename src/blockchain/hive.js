@@ -195,9 +195,12 @@ exports.buildMakeHiveInterface = ({ hive, eventEmitter, userDatabase, getUserSta
   }
 
   async function prepareTransferTransaction({ from, to, amount, currency, memo}){
+    let dhiveClient = new dhive.Client(process.env.HIVE_NODES.split(','), {
+      chainId: process.env.HIVE_CHAIN_ID,
+    })
     currency == 'HDB' ? 'HBD' : "HIVE"
     let expireTime = 1000 * 3590;
-    let props = await client.database.getDynamicGlobalProperties();
+    let props = await dhiveClient.database.getDynamicGlobalProperties();
     let ref_block_num = props.head_block_number & 0xFFFF;
     let ref_block_prefix = Buffer.from(props.head_block_id, 'hex').readUInt32LE(4);
     let expiration = new Date(Date.now() + expireTime).toISOString().slice(0, -5);

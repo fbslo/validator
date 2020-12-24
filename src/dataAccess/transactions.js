@@ -16,7 +16,7 @@ exports.makeTransactionsDatabase = ({ makeDatabase }) => {
   async function findByReferenceID(id){
     const db = await makeDatabase();
     const result = await db.collection("transactions").findOne({ referenceTransaction: id });
-    return result.toArray();
+    return result ? result.toArray() : false;
   }
 
   async function updateByReferenceID(id, data){
@@ -27,8 +27,8 @@ exports.makeTransactionsDatabase = ({ makeDatabase }) => {
 
   async function insert(data){
     const db = await makeDatabase();
-    const result = await db.collection("transactions").insert({ data });
-    return result.toArray();
+    const result = await db.collection("transactions").insertOne( data );
+    return result.modifiedCount > 0 ? true : false
   }
 
   async function removeByReferenceID(username){

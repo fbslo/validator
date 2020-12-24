@@ -1,5 +1,7 @@
 const { validator } = require("../../validator/index.js")
 const { hive } = require("../../blockchain/index.js")
+const { p2p } = require("../index.js")
+const { transactionDatabase, statusDatabase } = require('../../dataAccess/index.js')
 
 const p2pEventsHandler = async (event, data) => {
   try {
@@ -7,7 +9,11 @@ const p2pEventsHandler = async (event, data) => {
       case "requestHiveToWrappedConversionSiganture":
         break;
       case "requestWrappedToHiveConversionSiganture":
-        let signature = await validator(`hive`, data.referenceTransaction, data.transaction);
+        let signedTransaction = await validator(`hive`, data.referenceTransaction, data.transaction);
+        p2p.sendEventByName(`shareSignature`, {
+          referenceTransaction: data.referenceTransaction,
+          signature: signedTransaction.signatures[0]
+        })
         break;
       case "sharePeerList":
         break;
@@ -16,6 +22,28 @@ const p2pEventsHandler = async (event, data) => {
       case "requestPeerSiganture":
         break;
       case "shareSignature":
+        // TODO: verify signatue is correct
+        let isAlreadyStored = await transactionDatabase.findByReferenceID(data.referenceTransaction)
+        let currentValidator = await statusDatabase.findByName(`headValidator`)
+        let signatures = []
+        if (!isAlreadyStored) {
+          await transactionDatabase.insert({
+            referenceTransaction: data.referenceTransaction,
+            signatures: [data.signature]
+          })
+          signatures.push(data.signatue)
+        } else {
+          await transactionDatabase.updateByReferenceID(data.referenceTransaction, {
+            $push: {  signatures: data.signature }
+          })
+          signatures.push(isAlreadyStored.signatures)
+          signatures.push(data.signatue)
+        }
+        if (signatures.length >= 2 && currentValidator == process.env.VALIDATOR){ // TODO: add threshold
+          isAlreadyStored.sigantures = []
+          isAlreadyStored.signatures.push(...signatures)
+          let broadcast = await hive.broadcast(isAlreadyStored)
+        }
         break;
     }
   } catch (e) {

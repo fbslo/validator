@@ -28,8 +28,8 @@ exports.makeValidatorsDatabase = ({ makeDatabase }) => {
 
   async function insert(data){
     const db = await makeDatabase();
-    const result = await db.collection("validators").insert({ data });
-    return result.toArray();
+    const result = await db.collection("validators").insertOne({ data });
+    return result.modifiedCount > 0 ? true : false
   }
 
   async function removeByUsername(username){
