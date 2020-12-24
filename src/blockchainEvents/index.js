@@ -33,25 +33,34 @@ function blockchainEventsListener(){
     }
 
     for (i in notProcessedTransactions){
-      let preparedTransaction = await hive.prepareTransferTransaction({
-        from: process.env.HIVE_DEPOSIT_ACCOUNT,
-        to: notProcessedTransactions[i].returnValues.username,
-        amount: notProcessedTransactions[i].returnValues.amount / Math.pow(10, process.env.ETHEREUM_TOKEN_PRECISION),
-        currency: "HIVE",
-        memo: `wHIVE converted`
-      })
-      await transactionDatabase.insert({
-        referenceTransaction: notProcessedTransactions[i].transactionHash,
-        transaction: preparedTransaction,
-        isProcessed: false,
-        createdAt: new Date().getTime()
-      })
       let currentValidator = await statusDatabase.findByName(`headValidator`)
       if (currentValidator[0] == process.env.VALIDATOR){
+        let preparedTransaction = await hive.prepareTransferTransaction({
+          from: process.env.HIVE_DEPOSIT_ACCOUNT,
+          to: notProcessedTransactions[i].returnValues.username,
+          amount: notProcessedTransactions[i].returnValues.amount / Math.pow(10, process.env.ETHEREUM_TOKEN_PRECISION),
+          currency: "HIVE",
+          memo: `wHIVE converted`
+        })
+        await transactionDatabase.insert({
+          referenceTransaction: notProcessedTransactions[i].transactionHash,
+          transaction: preparedTransaction,
+          isProcessed: false,
+          headValidator: process.env.VALIDATOR,
+          createdAt: new Date().getTime()
+        });
         p2p.sendEventByName('requestWrappedToHiveConversionSiganture', {
           referenceTransaction: notProcessedTransactions[i].transactionHash,
           transaction: preparedTransaction
         })
+      } else {
+        await transactionDatabase.insert({
+          referenceTransaction: notProcessedTransactions[i].transactionHash,
+          transaction: false,
+          isProcessed: false,
+          headValidator: currentValidator[0],
+          createdAt: new Date().getTime()
+        });
       }
     }
   })
