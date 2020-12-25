@@ -9,6 +9,7 @@ exports.buildMakeHiveInterface = ({ hive, eventEmitter, userDatabase, getUserSta
     getTransactionByID,
     getBlockHash,
     getAccount,
+    getAuthoritiesInfo,
     sign,
     broadcast,
     prepareTransferTransaction
@@ -176,6 +177,16 @@ exports.buildMakeHiveInterface = ({ hive, eventEmitter, userDatabase, getUserSta
   async function getAccount(account){
     let accountDetails = await hive.api('get_accounts', [[account]]);
     return accountDetails[0];
+  }
+
+  async function getAuthoritiesInfo(){
+    let accountDetails = await hive.api('get_accounts', [[process.env.HIVE_DEPOSIT_ACCOUNT]]);
+    let weightPerAuth = account[0].active.account_auths.length > 0 ? account[0].active.account_auths[0][1] : account[0].active.key_auths[0][1]
+    return {
+      threshold: accountDetails[0].active.weight_threshold,
+      weightPerAuth: weightPerAuth,
+      requiredSignatures: accountDetails[0].active.weight_threshold / weightPerAuth
+    }
   }
 
   async function sign(rawTransaction){

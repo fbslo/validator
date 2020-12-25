@@ -39,7 +39,8 @@ const p2pEventsHandler = async (event, data) => {
           signatures.push(isAlreadyStored.signatures)
           signatures.push(data.signatue)
         }
-        if (signatures.length >= 2 && currentValidator == process.env.VALIDATOR){ // TODO: add threshold
+        let { requiredSignatures } = hive.getAuthoritiesInfo()
+        if (signatures.length >= requiredSignatures && currentValidator == process.env.VALIDATOR){ // TODO: add threshold
           isAlreadyStored.sigantures = []
           isAlreadyStored.signatures.push(...signatures)
           let broadcast = await hive.broadcast(isAlreadyStored)
