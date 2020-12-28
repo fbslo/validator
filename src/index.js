@@ -5,7 +5,7 @@ const { hive, ethereum } = require("./blockchain/index.js")
 const governance = require("./governance/index.js")
 const blockchainEvents = require("./blockchainEvents/index.js")
 
-// p2p.listen()
+p2p.listen()
 // governance.listen()
 //
 // hive.streamBlockchain()

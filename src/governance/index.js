@@ -3,11 +3,11 @@ const { statusDatabase } = require("../dataAccess/index.js")
 const { hive } = require('../blockchain/index.js')
 
 async function listen(){
-  console.log("Listening to governance...")
+  console.log("Listening to governance changes...")
   eventEmitter.on(`switchHeadValidator`, async (data) => {
     let scheduleNumber = await getScheduleNumber(data.headBlock)
     let newHeadValidator = await getNewHeadValidator(scheduleNumber)
-    console.log(newHeadValidator)
+    console.log(`New head validator:`, newHeadValidator)
     let saveNewHeadValidator = await statusDatabase.updateByName(`headValidator`, newHeadValidator)
   })
 }
