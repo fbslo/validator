@@ -1,8 +1,8 @@
-const { validator } = require("../../validator/index.js")
+const { p2p } = require("../../p2p/index.js")
 const { hive } = require("../../blockchain/index.js")
-const { p2p } = require("../index.js")
+const { validator } = require("../../validator/index.js")
 const { transactionDatabase, statusDatabase } = require('../../dataAccess/index.js')
-
+console.log(p2p)
 const p2pEventsHandler = async (event, data) => {
   try {
     switch (event){

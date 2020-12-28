@@ -18,8 +18,8 @@ exports.makeP2P = ({ io, ioClient, server, validatorDatabase, p2pEventsHandler }
   }
 
   async function socketConnected(socket){
-    let socketIP = socket.io.opts.hostname
-    let connectedIPs = sockets.map(socket => { return socket.io.opts.hostname })
+    let socketIP = socket.handshake.address.split(":").slice(-1)[0]
+    let connectedIPs = sockets.map(socket => { return socket.handshake.address.split(":").slice(-1)[0] })
     if (blacklist.includes(socketIP) || connectedIPs.includes(socketIP) && !acceptDuplicates) {
       rejectBlacklisted(socket)
       return;
