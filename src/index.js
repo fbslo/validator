@@ -9,5 +9,5 @@ p2p.listen()
 // governance.listen()
 //
 // hive.streamBlockchain()
-ethereum.streamEthereumEvents()
-blockchainEvents.blockchainEventsListener()
+// ethereum.streamEthereumEvents()
+// blockchainEvents.blockchainEventsListener()
