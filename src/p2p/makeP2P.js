@@ -18,8 +18,8 @@ exports.makeP2P = ({ io, ioClient, server, validatorDatabase, p2pEventsHandler }
   }
 
   async function socketConnected(socket){
-    let socketIP = socket.handshake.address.split(":").slice(-1)[0]
-    let connectedIPs = sockets.map(socket => { return socket.handshake.address.split(":").slice(-1)[0] })
+    let socketIP = socket.io.opts.hostname
+    let connectedIPs = sockets.map(socket => { return socket.io.opts.hostname })
     if (blacklist.includes(socketIP) || connectedIPs.includes(socketIP) && !acceptDuplicates) {
       rejectBlacklisted(socket)
       return;
@@ -48,14 +48,15 @@ exports.makeP2P = ({ io, ioClient, server, validatorDatabase, p2pEventsHandler }
         onevent.call(this, packet); // additional call to catch-all
     };
     socket.on("*", (event, data) => {
-      p2pEventsHandler(event, data)
+      if (event == 'disconnect') socketDisconnected(socket);
+      else p2pEventsHandler(event, data)
     })
   }
 
   async function connectToNodes(){
     let nodes = await validatorDatabase.findAllAddresses()
     nodes.forEach(node => {
-      const socket = ioClient("http://"+node.address, {
+      const socket = ioClient("http://"+node, {
         transports: ['websocket']
       });
       socket.on('connect', () => socketConnected(socket));
