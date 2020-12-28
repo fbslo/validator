@@ -1,8 +1,8 @@
-const { eventEmitter } = require("../eventHandler/index.js")
-const { validator } = require("../validator/index.js")
-const { transactionDatabase, statusDatabase } = require('../dataAccess/index.js')
-const { p2p } = require("../p2p/index.js")
-const { hive, ethereum } = require("../blockchain/index.js")
+const { eventEmitter } = require("../index.js")
+const { validator } = require("../../validator/index.js")
+const { transactionDatabase, statusDatabase } = require('../../dataAccess/index.js')
+const { p2p } = require("../../p2p/index.js")
+const { hive, ethereum } = require("../../blockchain/index.js")
 
 function blockchainEventsListener(){
   eventEmitter.on(`hiveDeposit`, (data) => {

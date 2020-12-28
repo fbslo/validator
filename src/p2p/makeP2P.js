@@ -49,7 +49,7 @@ exports.makeP2P = ({ io, ioClient, server, validatorDatabase, p2pEventsHandler }
     };
     socket.on("*", (event, data) => {
       if (event == 'disconnect') socketDisconnected(socket);
-      else p2pEventsHandler(event, data)
+      else p2pEventsHandler(event, data, sendEventByName)
     })
   }
 

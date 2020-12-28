@@ -1,16 +1,15 @@
-const { p2p } = require("../../p2p/index.js")
 const { hive } = require("../../blockchain/index.js")
 const { validator } = require("../../validator/index.js")
 const { transactionDatabase, statusDatabase } = require('../../dataAccess/index.js')
-console.log(p2p)
-const p2pEventsHandler = async (event, data) => {
+
+const p2pEventsHandler = async (event, data, sendEventByName) => {
   try {
     switch (event){
       case "requestHiveToWrappedConversionSiganture":
         break;
       case "requestWrappedToHiveConversionSiganture":
         let signedTransaction = await validator(`hive`, data.referenceTransaction, data.transaction);
-        p2p.sendEventByName(`shareSignature`, {
+        sendEventByName(`shareSignature`, {
           referenceTransaction: data.referenceTransaction,
           signature: signedTransaction.signatures[0]
         })
