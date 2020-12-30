@@ -1,6 +1,7 @@
 const { hive } = require("../../blockchain/index.js")
 const { validator } = require("../../validator/index.js")
 const { transactionDatabase, statusDatabase } = require('../../dataAccess/index.js')
+const { heartbeat } = require("./network/heartbeat.js")
 
 const p2pEventsHandler = async (event, data, sendEventByName) => {
   try {
@@ -17,6 +18,12 @@ const p2pEventsHandler = async (event, data, sendEventByName) => {
       case "sharePeerList":
         break;
       case "heartbeat":
+        sendEventByName(`heartbeatResponse`, {
+          username: process.env.VALIDATOR,
+          signature: 
+        })
+        break;
+      case "heartbeatResponse":
         break;
       case "requestPeerSiganture":
         break;

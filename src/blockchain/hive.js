@@ -12,7 +12,8 @@ exports.buildMakeHiveInterface = ({ hive, eventEmitter, userDatabase, getUserSta
     getAuthoritiesInfo,
     sign,
     broadcast,
-    prepareTransferTransaction
+    prepareTransferTransaction,
+    signMessage
   })
 
   async function streamBlockchain(callback){
@@ -229,5 +230,10 @@ exports.buildMakeHiveInterface = ({ hive, eventEmitter, userDatabase, getUserSta
       ref_block_prefix
     }
     return tx;
+  }
+
+  async function signMessage(message){
+    let signedMessage = await dhive.PrivateKey.sign(message);
+    return signedMessage;
   }
 }
