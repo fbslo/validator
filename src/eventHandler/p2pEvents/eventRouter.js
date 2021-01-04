@@ -20,7 +20,7 @@ const p2pEventsHandler = async (event, data, sendEventByName) => {
       case "heartbeat":
         sendEventByName(`heartbeatResponse`, {
           username: process.env.VALIDATOR,
-          signature: 
+          message: hive.signMessage(`${new Date().getTime()} - heartbeat`)
         })
         break;
       case "heartbeatResponse":
