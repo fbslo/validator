@@ -1,0 +1,44 @@
+Propose transaction (head validator only)
+
+{
+  name: propose_transaction,
+  data: {
+    chain: hive/ethereum,
+    referenceTransaction: ref_tx
+    transaction: tx
+  }
+}
+
+---
+
+{
+  name: signature,
+  data: {
+    chain: hive/ethereum,
+    referenceTransaction: ref_tx,
+    signature: tx_signature,
+    transaction: tx
+    transactionHash: SHA256 hash of transaction
+  }
+}
+
+---
+
+{
+  name: network_state
+  data: {
+    headBlockHive: 1000,
+    headBlockEthereum: 1000,
+    validatorsHash: SHA 256 hash of stringified array of active validators by alphabetic order
+  }
+}
+
+---
+
+{
+  name: propose_validator_removal,
+  data: {
+    removeValidator: username of rouge validator,
+    reson: inactive (not signing txs)/fake signatures (not signing transactions that were approved)
+  }
+}
