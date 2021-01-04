@@ -13,6 +13,7 @@ exports.buildMakeHiveInterface = ({ hive, eventEmitter, userDatabase, getUserSta
     getAuthoritiesInfo,
     sign,
     broadcast,
+    sendCustomJson,
     prepareTransferTransaction,
     signMessage
   })
@@ -212,6 +213,23 @@ exports.buildMakeHiveInterface = ({ hive, eventEmitter, userDatabase, getUserSta
     })
     let sendSignedTransaction = await dhiveClient.broadcast.send(signedTransaction);
     return sendSignedTransaction;
+  }
+
+  async function sendCustomJson(id, json){
+    return new Promise((resolve, reject) => {
+      let dhiveClient = new dhive.Client(process.env.HIVE_NODES.split(','), {
+        chainId: process.env.HIVE_CHAIN_ID,
+      })
+      client.broadcast.json({
+          required_auths: [process.env.VALIDATOR],
+          required_posting_auths: [],
+          id: id,
+          json: JSON.stringify(json),
+      }, process.env.ACTIVE_HIVE_KEY).then(
+          result => { resolve(result) },
+          error => { reject(err) }
+      )
+    })
   }
 
   async function prepareTransferTransaction({ from, to, amount, currency, memo}){
