@@ -36,9 +36,29 @@ Propose transaction (head validator only)
 ---
 
 {
+  name: propose_new_validator,
+  data: {
+    username: valdiator username,
+    url: hive post url,
+    metedata: some other info
+  }
+}
+
+---
+
+{
   name: propose_validator_removal,
   data: {
     removeValidator: username of rouge validator,
     reson: inactive (not signing txs)/fake signatures (not signing transactions that were approved)
+  }
+}
+
+---
+
+{
+  name: whitelist_validator,
+  data: {
+    username: whitelisted validator username
   }
 }

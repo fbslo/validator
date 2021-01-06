@@ -1,16 +1,16 @@
-exports.makeP2P = ({ hive, validatorDatabase, p2pEventsHandler }) => {
+exports.makeP2P = ({ hive, validatorDatabase, eventEmitter }) => {
   return Object.freeze({
     listen,
     sendEventByName
   })
 
   async function listen(){
-    hive.blockchainCallback((block) => {
+    hive.blockchainCallback((block_num, block) => {
       for (const transaction of block.transactions) {
         for (const op of transaction.operations){
           let type = op[0]
           let data = op[1]
-          if (type == 'custom_json' && data.id == 'wrapped_hive_p2p'){
+          if (type == 'custom_json' && data.id == 'wrapped_hive_p2p' && data.required_auths.length > 0){
             processTransaction(data)
           }
         }
@@ -23,16 +23,24 @@ exports.makeP2P = ({ hive, validatorDatabase, p2pEventsHandler }) => {
       let json = JSON.parse(data.json)
       switch (json.name) {
         case 'propose_transaction':
-          p2pEventsHandler.emit("propose_transaction", json.data)
+          eventEmitter.emit("propose_transaction", json.data)
           break;
         case 'signature':
-          p2pEventsHandler.emit("signature", json.data)
+          eventEmitter.emit("signature", json.data)
           break;
         case 'network_state':
-          p2pEventsHandler.emit("network_state", json.data)
+          eventEmitter.emit("network_state", json.data)
           break;
         case 'propose_validator_removal':
-          p2pEventsHandler.emit("propose_validator_removal", json.data)
+          eventEmitter.emit("propose_validator_removal", json.data)
+          break;
+        case 'propose_new_validator':
+          eventEmitter.emit("propose_new_validator", json.data)
+          break;
+        case 'whitelist_validator':
+          if (data.required_auths[0] == process.env.VALIDATOR){
+            eventEmitter.emit("whitelist_validator", json.data)
+          };
           break;
       }
     } catch (e){
