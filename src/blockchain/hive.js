@@ -216,19 +216,23 @@ exports.buildMakeHiveInterface = ({ hive, eventEmitter, userDatabase, getUserSta
     return sendSignedTransaction;
   }
 
-  async function sendCustomJson(id, json){
+  async function sendCustomJson(name, json){
     return new Promise((resolve, reject) => {
       let dhiveClient = new dhive.Client(process.env.HIVE_NODES.split(','), {
         chainId: process.env.HIVE_CHAIN_ID,
       })
-      client.broadcast.json({
+      let key = dhive.PrivateKey.fromString(process.env.ACTIVE_HIVE_KEY)
+      dhiveClient.broadcast.json({
           required_auths: [process.env.VALIDATOR],
           required_posting_auths: [],
-          id: id,
-          json: JSON.stringify(json),
-      }, process.env.ACTIVE_HIVE_KEY).then(
-          result => { resolve(result) },
-          error => { reject(err) }
+          id: "wrapped_hive_p2p",
+          json: JSON.stringify({
+            name: name,
+            data: json
+          }, null, ''),
+      }, key).then(
+          result => { console.log(result) },
+          error => { console.log(error) }
       )
     })
   }
@@ -265,6 +269,9 @@ exports.buildMakeHiveInterface = ({ hive, eventEmitter, userDatabase, getUserSta
   }
 
   async function verifySignature(signature, transaction){
+    let dhiveClient = new dhive.Client(process.env.HIVE_NODES.split(','), {
+      chainId: process.env.HIVE_CHAIN_ID,
+    })
     try {
       let { cryptoUtils, Signature } = require("dhive")
       let msg = {
@@ -279,6 +286,7 @@ exports.buildMakeHiveInterface = ({ hive, eventEmitter, userDatabase, getUserSta
       let key = (new Signature(signature.data, signature.recovery)).recover(digest);
       let [owner] = await client.database.call('get_key_references', [[publicKey]]);
       if (owner) return owner;
+      else return false;
     } catch (e) {
       console.log(e)
       return false;

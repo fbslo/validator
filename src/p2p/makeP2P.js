@@ -50,10 +50,7 @@ exports.makeP2P = ({ hive, validatorDatabase, eventEmitter }) => {
 
   async function sendEventByName(eventName, eventData){
     try {
-      let transaction = await hive.sendCustomJson(`wrapped_hive_p2p`, {
-        name: eventData,
-        data: eventData
-      });
+      let transaction = await hive.sendCustomJson(eventName, JSON.stringify(eventData));
       return true;
     } catch (e) {
       console.log(e);
