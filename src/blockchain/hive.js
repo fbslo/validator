@@ -15,7 +15,8 @@ exports.buildMakeHiveInterface = ({ hive, eventEmitter, userDatabase, getUserSta
     broadcast,
     sendCustomJson,
     prepareTransferTransaction,
-    signMessage
+    signMessage,
+    verifySignature
   })
 
   async function blockchainCallback(callback){
@@ -261,5 +262,26 @@ exports.buildMakeHiveInterface = ({ hive, eventEmitter, userDatabase, getUserSta
   async function signMessage(message){
     let signedMessage = await dhive.PrivateKey.sign(message);
     return signedMessage;
+  }
+
+  async function verifySignature(signature, transaction){
+    try {
+      let { cryptoUtils, Signature } = require("dhive")
+      let msg = {
+        expiration: transaction.transactionexpiration,
+        extensions: transaction.extensions,
+        operations: transaction.operations,
+        ref_block_num: transaction.ref_block_num,
+        ref_block_prefix: transaction.ref_block_prefix
+      };
+      let digest = cryptoUtils.transactionDigest(msg);
+      // Finding public key of the private that was used to sign
+      let key = (new Signature(signature.data, signature.recovery)).recover(digest);
+      let [owner] = await client.database.call('get_key_references', [[publicKey]]);
+      if (owner) return owner;
+    } catch (e) {
+      console.log(e)
+      return false;
+    }
   }
 }

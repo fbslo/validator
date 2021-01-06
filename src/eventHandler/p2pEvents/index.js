@@ -43,12 +43,12 @@ function p2pEventsListener(){
     }
   })
 
-  eventEmitter.on('propose_new_validator', (data) => {
+  eventEmitter.on('propose_new_validator', async (data) => {
     // TODO: add new propsed validator to db
   })
 
-  eventEmitter.on('whitelist_validator', (data) => {
-    // TODO: add whitelisted validator to database
+  eventEmitter.on('whitelist_validator', async (data) => {
+    let storeNewWhitelisted = await statusDatabase.addWhitelistedValidator(data.username)
   })
 }
 
