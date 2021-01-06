@@ -7,6 +7,7 @@ const blockchainEvents = require("./eventHandler/blockchainEvents/index.js")
 const p2pEvents = require("./eventHandler/p2pEvents/index.js")
 
 p2p.listen()
+p2pEvents.p2pEventsListener()
 // governance.listen()
 //
 // hive.streamBlockchain()

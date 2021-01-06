@@ -10,7 +10,7 @@ exports.makeP2P = ({ hive, validatorDatabase, eventEmitter }) => {
         for (const op of transaction.operations){
           let type = op[0]
           let data = op[1]
-          if (type == 'custom_json' && data.id == 'wrapped_hive_p2p' && data.required_auths.length > 0){
+          if (type == 'custom_json' && data.id == 'wrapped_hive_p2p' && data.required_auths && data.required_auths.length > 0){
             processTransaction(data)
           }
         }

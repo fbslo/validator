@@ -2,13 +2,13 @@ const { hive } = require("../../blockchain/index.js")
 const { validator } = require("../../validator/index.js")
 const { transactionDatabase, statusDatabase } = require('../../dataAccess/index.js')
 const { eventEmitter } = require("../index.js")
+const { p2p } = require("../../p2p/index.js")
 
 function p2pEventsListener(){
   eventEmitter.on('propose_transaction', async (data) => {
-    console.log('proposing transaction:', data)
     if (data.chain == 'hive'){
       let signedTransaction = await validator(`hive`, data.referenceTransaction, data.transaction);
-      sendEventByName(`signature`, {
+      p2p.sendEventByName(`signature`, {
         referenceTransaction: data.referenceTransaction,
         signature: signedTransaction.signatures[0]
       })
