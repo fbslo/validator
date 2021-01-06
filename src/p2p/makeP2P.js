@@ -1,7 +1,6 @@
 exports.makeP2P = ({ hive, validatorDatabase, p2pEventsHandler }) => {
   return Object.freeze({
     listen,
-    getConnectedNodes,
     sendEventByName
   })
 
@@ -20,12 +19,25 @@ exports.makeP2P = ({ hive, validatorDatabase, p2pEventsHandler }) => {
   }
 
   async function processTransaction(data){
-    // TODO:
-  }
-
-  async function getConnectedNodes(){
-    // TODO: get nodes  from db
-    return false;
+    try {
+      let json = JSON.parse(data.json)
+      switch (json.name) {
+        case 'propose_transaction':
+          p2pEventsHandler.emit("propose_transaction", json.data)
+          break;
+        case 'signature':
+          p2pEventsHandler.emit("signature", json.data)
+          break;
+        case 'network_state':
+          p2pEventsHandler.emit("network_state", json.data)
+          break;
+        case 'propose_validator_removal':
+          p2pEventsHandler.emit("propose_validator_removal", json.data)
+          break;
+      }
+    } catch (e){
+      console.log(e)
+    }
   }
 
   async function sendEventByName(eventName, eventData){
