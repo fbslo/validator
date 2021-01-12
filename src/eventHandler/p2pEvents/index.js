@@ -5,20 +5,22 @@ const { eventEmitter } = require("../index.js")
 const { p2p } = require("../../p2p/index.js")
 
 function p2pEventsListener(){
-  eventEmitter.on('propose_transaction', async (data) => {
+  eventEmitter.on('propose_transaction', async (data, proposalTransaction) => {
     if (data.chain == 'hive'){
       let signedTransaction = await validator(`hive`, data.referenceTransaction, data.transaction);
       p2p.sendEventByName(`signature`, {
         referenceTransaction: data.referenceTransaction,
-        signature: signedTransaction.signatures[0]
+        signature: signedTransaction.signatures[0],
+        proposalTransaction: proposalTransaction
       })
     } else if (data.chain == 'ethereum'){
       // TODO: do ethereum
     }
   })
 
-  eventEmitter.on('signature', async (data) => {
-    // TODO: verify signatue is correct
+  eventEmitter.on('signature', async (data, sender) => {
+    let signed = await hive.verifySignature(data.signature, data.proposalTransaction)
+    // TODO: check if signer is valid validator
     let isAlreadyStored = await transactionDatabase.findByReferenceID(data.referenceTransaction)
     let currentValidator = await statusDatabase.findByName(`headValidator`)
     let signatures = []

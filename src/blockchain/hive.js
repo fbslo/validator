@@ -268,12 +268,14 @@ exports.buildMakeHiveInterface = ({ hive, eventEmitter, userDatabase, getUserSta
     return signedMessage;
   }
 
-  async function verifySignature(signature, transaction){
+  async function verifySignature(signature, proposalTransactionId){
     let dhiveClient = new dhive.Client(process.env.HIVE_NODES.split(','), {
       chainId: process.env.HIVE_CHAIN_ID,
     })
+    let { cryptoUtils, Signature } = dhive
     try {
-      let { cryptoUtils, Signature } = require("dhive")
+      let proposalTransaction = await getTransactionByID(proposalTransactionId)
+      let transaction = JSON.parse(JSON.parse(proposalTransaction.operations[0][1].json).data).transaction
       let msg = {
         expiration: transaction.transactionexpiration,
         extensions: transaction.extensions,
