@@ -16,7 +16,7 @@ exports.makeTransactionsDatabase = ({ makeDatabase }) => {
   async function findByReferenceID(id){
     const db = await makeDatabase();
     const result = await db.collection("transactions").findOne({ referenceTransaction: id });
-    return result ? result.toArray() : false;
+    return result ? result : false;
   }
 
   async function updateByReferenceID(id, data){

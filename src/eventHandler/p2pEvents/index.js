@@ -4,7 +4,7 @@ const { transactionDatabase, statusDatabase } = require('../../dataAccess/index.
 const { eventEmitter } = require("../index.js")
 const { p2p } = require("../../p2p/index.js")
 
-function p2pEventsListener(){
+async function p2pEventsListener(){
   eventEmitter.on('propose_transaction', async (data, proposalTransaction) => {
     if (data.chain == 'hive'){
       let signedTransaction = await validator(`hive`, data.referenceTransaction, data.transaction);
@@ -19,34 +19,43 @@ function p2pEventsListener(){
   })
 
   eventEmitter.on('signature', async (data, sender) => {
-    let isValidSender = false
-    data = JSON.parse(data)
-    let signed = await hive.verifySignature(data.signature, data.proposalTransaction)
-    // TODO: check if signer is valid validator
-    for (i in signed){
-      if (signed[i] == sender) isValidSender = true;
-    }
-    let isAlreadyStored = await transactionDatabase.findByReferenceID(data.referenceTransaction)
-    let currentValidator = await statusDatabase.findByName(`headValidator`)
-    let signatures = []
-    if (!isAlreadyStored) {
-      await transactionDatabase.insert({
-        referenceTransaction: data.referenceTransaction,
-        signatures: [data.signature]
-      })
-      signatures.push(data.signatue)
-    } else {
-      await transactionDatabase.updateByReferenceID(data.referenceTransaction, {
-        $push: {  signatures: data.signature }
-      })
-      signatures.push(isAlreadyStored.signatures)
-      signatures.push(data.signatue)
-    }
-    let { requiredSignatures } = hive.getAuthoritiesInfo()
-    if (signatures.length >= requiredSignatures && currentValidator == process.env.VALIDATOR){
-      isAlreadyStored.sigantures = []
-      isAlreadyStored.signatures.push(...signatures)
-      let broadcast = await hive.broadcast(isAlreadyStored)
+    try {
+      let isValidSender = false
+      data = JSON.parse(data)
+      let signed = await hive.verifySignature(data.signature, data.proposalTransaction)
+      for (i in signed){
+        if (signed[i] == sender[0]) isValidSender = true;
+      }
+      // TODO: check if sender is our validator
+      if (isValidSender){
+        let isAlreadyStored = await transactionDatabase.findByReferenceID(data.referenceTransaction)
+        let currentValidator = await statusDatabase.findByName(`headValidator`)
+        let signatures = []
+        if (!isAlreadyStored) {
+          await transactionDatabase.insert({
+            referenceTransaction: data.referenceTransaction,
+            signatures: [data.signature]
+          })
+          signatures.push(data.signatue)
+        } else {
+          await transactionDatabase.updateByReferenceID(data.referenceTransaction, {
+            $push: {  signatures: data.signature }
+          })
+          signatures.push(isAlreadyStored.signatures)
+          signatures.push(data.signatue)
+        }
+        let { requiredSignatures } = hive.getAuthoritiesInfo()
+        if (signatures.length >= requiredSignatures && currentValidator == process.env.VALIDATOR){
+          isAlreadyStored.sigantures = []
+          isAlreadyStored.signatures.push(...signatures)
+          let broadcast = await hive.broadcast(isAlreadyStored)
+        }
+      }  else {
+        console.log(`Signature was signed by ${signed}, but sent by ${sender[0]}`)
+      }
+    } catch (e) {
+      console.log(e)
+      // TODO: handle errors
     }
   })
 

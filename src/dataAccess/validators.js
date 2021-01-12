@@ -17,7 +17,7 @@ exports.makeValidatorsDatabase = ({ makeDatabase }) => {
   async function findByUsername(username){
     const db = await makeDatabase();
     const result = await db.collection("validators").findOne({ username: username });
-    return result.toArray();
+    return result;
   }
 
   async function updateByUsername(username, data){
