@@ -23,7 +23,9 @@ exports.makeP2P = ({ hive, validatorDatabase, eventEmitter }) => {
       let json = JSON.parse(data.json)
       switch (json.name) {
         case 'propose_transaction':
-          eventEmitter.emit("propose_transaction", json.data, transaction_id)
+          if (data.required_auths[0] != process.env.VALIDATOR){
+            eventEmitter.emit("propose_transaction", json.data, transaction_id)
+          }
           break;
         case 'signature':
           eventEmitter.emit("signature", json.data, data.required_auths)

@@ -275,18 +275,19 @@ exports.buildMakeHiveInterface = ({ hive, eventEmitter, userDatabase, getUserSta
     let { cryptoUtils, Signature } = dhive
     try {
       let proposalTransaction = await getTransactionByID(proposalTransactionId)
-      let transaction = JSON.parse(JSON.parse(proposalTransaction.operations[0][1].json).data).transaction
+      let transaction = JSON.parse(proposalTransaction.operations[0][1].json).data.transaction
       let msg = {
-        expiration: transaction.transactionexpiration,
+        expiration: transaction.expiration,
         extensions: transaction.extensions,
         operations: transaction.operations,
         ref_block_num: transaction.ref_block_num,
         ref_block_prefix: transaction.ref_block_prefix
       };
+      let sig = Signature.fromString(signature);
       let digest = cryptoUtils.transactionDigest(msg);
       // Finding public key of the private that was used to sign
-      let key = (new Signature(signature.data, signature.recovery)).recover(digest);
-      let [owner] = await client.database.call('get_key_references', [[publicKey]]);
+      let key = (new Signature(sig.data, sig.recovery)).recover(digest);
+      let [owner] = await dhiveClient.database.call('get_key_references', [[key]]);
       if (owner) return owner;
       else return false;
     } catch (e) {
