@@ -26,8 +26,8 @@ async function p2pEventsListener(){
       for (i in signed){
         if (signed[i] == sender[0]) isValidSender = true;
       }
-      // TODO: check if sender is our validator
-      if (isValidSender){
+      let activeValidators = await hive.getAuthoritiesInfo()
+      if (isValidSender && activeValidators.auths.includes(sender[0])){
         let isAlreadyStored = await transactionDatabase.findByReferenceID(data.referenceTransaction)
         let currentValidator = await statusDatabase.findByName(`headValidator`)
         let signatures = []

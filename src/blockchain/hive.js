@@ -196,7 +196,8 @@ exports.buildMakeHiveInterface = ({ hive, eventEmitter, userDatabase, getUserSta
     return {
       threshold: accountDetails[0].active.weight_threshold,
       weightPerAuth: weightPerAuth,
-      requiredSignatures: accountDetails[0].active.weight_threshold / weightPerAuth
+      requiredSignatures: accountDetails[0].active.weight_threshold / weightPerAuth,
+      auths: account[0].active.account_auths
     }
   }
 
