@@ -26,8 +26,8 @@ async function p2pEventsListener(){
       for (i in signed){
         if (signed[i] == sender[0]) isValidSender = true;
       }
-      let activeValidators = await hive.getAuthoritiesInfo()
-      if (isValidSender && activeValidators.auths.includes(sender[0])){
+      let { requiredSignatures, auths } = await hive.getAuthoritiesInfo()
+      if (isValidSender && auths.includes(sender[0])){
         let isAlreadyStored = await transactionDatabase.findByReferenceID(data.referenceTransaction)
         let currentValidator = await statusDatabase.findByName(`headValidator`)
         let signatures = []
@@ -44,7 +44,6 @@ async function p2pEventsListener(){
           signatures.push(isAlreadyStored.signatures)
           signatures.push(data.signatue)
         }
-        let { requiredSignatures } = hive.getAuthoritiesInfo()
         if (signatures.length >= requiredSignatures && currentValidator == process.env.VALIDATOR){
           isAlreadyStored.sigantures = []
           isAlreadyStored.signatures.push(...signatures)
