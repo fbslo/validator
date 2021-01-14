@@ -74,7 +74,7 @@ exports.buildMakeHiveInterface = ({ hive, eventEmitter, userDatabase, getUserSta
 
   function validateTransfer(data, transaction){
     if (data.to == process.env.HIVE_DEPOSIT_ACCOUNT){
-      if (!data.from || !data.to || !data.amount || !data.memo){
+      if (!data.from || !data.to || !data.amount){
         throw new Error("Transfer data is required")
       }
       let transferDetails = {

@@ -4,16 +4,16 @@ const { transactionDatabase, statusDatabase } = require('../../dataAccess/index.
 const { p2p } = require("../../p2p/index.js")
 const { hive, ethereum } = require("../../blockchain/index.js")
 
-function blockchainEventsListener(){
-  eventEmitter.on(`hiveDeposit`, (data) => {
-    // TODO: prepare eth tx
-    let isAlreadyProcessed = await transactionDatabase.findByReferenceID(data[i].transaction_id);
+async function blockchainEventsListener(){
+  eventEmitter.on(`hiveConversion`, async (data) => {
+    console.log(`New hive deposit: ${data}`)
+    let isAlreadyProcessed = await transactionDatabase.findByReferenceID(data.transaction_id);
     if (!isAlreadyProcessed){
       let currentValidator = await statusDatabase.findByName(`headValidator`)
-      if (currentValidator[0] == process.env.VALIDATOR){
+      if (currentValidator[0].data == process.env.VALIDATOR){
         await transactionDatabase.insert({
           chain: 'ethereum',
-          referenceTransaction: data[i].transaction_id,
+          referenceTransaction: data.transaction_id,
           isProcessed: false,
           headValidator: process.env.VALIDATOR,
           createdAt: new Date().getTime(),
@@ -21,14 +21,14 @@ function blockchainEventsListener(){
         });
         p2p.sendEventByName('propose_transaction', {
           chain: 'ethereum',
-          referenceTransaction: data[i].transaction_id
+          referenceTransaction: data.transaction_id
         })
       } else {
         await transactionDatabase.insert({
           chain: 'ethereum',
-          referenceTransaction: data[i].transaction_id,
+          referenceTransaction: data.transaction_id,
           isProcessed: false,
-          headValidator: currentValidator[0],
+          headValidator: currentValidator[0].data,
           createdAt: new Date().getTime(),
           signatures: []
         });
