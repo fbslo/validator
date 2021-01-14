@@ -3,7 +3,6 @@ var users = [] //store users in memory instead of constant db calls
 exports.buildMakeHiveInterface = ({ hive, eventEmitter, userDatabase, getUserStake, dhive }) => {
   return Object.freeze({
     streamBlockchain,
-    blockchainCallback,
     validateTransfer,
     validateCustomJson,
     validateStakeModifyingOperation,
@@ -19,22 +18,20 @@ exports.buildMakeHiveInterface = ({ hive, eventEmitter, userDatabase, getUserSta
     verifySignature
   })
 
-  async function blockchainCallback(callback){
-    hive.stream({
-      on_block: callback,
-      irreversible: process.env.ENVIRONMENT == "production" ? true : false,
-    })
-  }
-
   async function streamBlockchain(){
     if (users.length == 0) {
       let usersFromDatabase = await userDatabase.findAll()
       users = usersFromDatabase.map(user => { return user['username'] })
     }
     hive.stream({
-      on_block: checkBlock,
+      on_block: routeStream,
       irreversible: process.env.ENVIRONMENT == "production" ? true : false,
     })
+  }
+
+  function routeStream(block_num, block){
+    eventEmitter.emit('new_block', block_num, block); //for p2p listener
+    checkBlock(block_num, block);
   }
 
   async function checkBlock(block_num, block){

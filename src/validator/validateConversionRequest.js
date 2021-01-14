@@ -15,13 +15,13 @@ module.exports.buildMakeValidateConversionRequest = ({ hive, ethereum, transacti
     if (!referenceTransaction){
       throw new Error(`Reference transaction is required`)
     }
-    if (!proposedTransaction || proposedTransaction.length < 1){
+    if (conversionDirection == 'hive' && (!proposedTransaction || proposedTransaction.length < 1)){
       throw new Error(`Proposed transaction is required`)
     }
     if (typeof referenceTransaction != 'string'){
       throw new Error(`Reference transaction must be a string`)
     }
-    if (typeof proposedTransaction != 'object' && typeof proposedTransaction != 'string'){
+    if (conversionDirection == 'hive' && (typeof proposedTransaction != 'object' && typeof proposedTransaction != 'string')){
       throw new Error(`Proposed transaction must be object or string`)
     }
 

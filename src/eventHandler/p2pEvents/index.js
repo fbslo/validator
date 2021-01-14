@@ -8,20 +8,29 @@ async function p2pEventsListener(){
   eventEmitter.on('propose_transaction', async (data, proposalTransaction) => {
     if (data.chain == 'hive'){
       let signedTransaction = await validator(`hive`, data.referenceTransaction, data.transaction);
-      p2p.sendEventByName(`signature`, {
-        chain: 'hive',
-        referenceTransaction: data.referenceTransaction,
-        proposalTransaction: proposalTransaction,
-        signature: signedTransaction.signatures[0]
-      })
+      if (signedTransaction){
+        p2p.sendEventByName(`signature`, {
+          chain: 'hive',
+          referenceTransaction: data.referenceTransaction,
+          proposalTransaction: proposalTransaction,
+          signature: signedTransaction.signatures[0]
+        })
+      } else {
+        console.log(`Signing failed:`, signedTransaction)
+      }
     } else if (data.chain == 'ethereum'){
       let signedTransaction = await validator(`ethereum`, data.referenceTransaction);
-      p2p.sendEventByName(`signature`, {
-        chain: 'ethereum',
-        referenceTransaction: data.referenceTransaction,
-        proposalTransaction: proposalTransaction,
-        signature: signedTransaction.signature
-      })
+      console.log(signedTransaction)
+      if (signedTransaction){
+        p2p.sendEventByName(`signature`, {
+          chain: 'ethereum',
+          referenceTransaction: data.referenceTransaction,
+          proposalTransaction: proposalTransaction,
+          signature: signedTransaction.signature
+        })
+      } else {
+        console.log(`Signing failed:`, signedTransaction)
+      }
     }
   })
 

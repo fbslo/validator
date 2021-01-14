@@ -6,7 +6,6 @@ const { hive, ethereum } = require("../../blockchain/index.js")
 
 async function blockchainEventsListener(){
   eventEmitter.on(`hiveConversion`, async (data) => {
-    console.log(`New hive deposit: ${data}`)
     let isAlreadyProcessed = await transactionDatabase.findByReferenceID(data.transaction_id);
     if (!isAlreadyProcessed){
       let currentValidator = await statusDatabase.findByName(`headValidator`)
