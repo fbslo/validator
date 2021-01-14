@@ -16,7 +16,8 @@ function blockchainEventsListener(){
           referenceTransaction: data[i].transaction_id,
           isProcessed: false,
           headValidator: process.env.VALIDATOR,
-          createdAt: new Date().getTime()
+          createdAt: new Date().getTime(),
+          signatures: []
         });
         p2p.sendEventByName('propose_transaction', {
           chain: 'ethereum',
@@ -28,7 +29,8 @@ function blockchainEventsListener(){
           referenceTransaction: data[i].transaction_id,
           isProcessed: false,
           headValidator: currentValidator[0],
-          createdAt: new Date().getTime()
+          createdAt: new Date().getTime(),
+          signatures: []
         });
       }
     }
@@ -73,7 +75,8 @@ function blockchainEventsListener(){
           transaction: preparedTransaction,
           isProcessed: false,
           headValidator: process.env.VALIDATOR,
-          createdAt: new Date().getTime()
+          createdAt: new Date().getTime(),
+          signatures: []
         });
         p2p.sendEventByName('propose_transaction', {
           chain: 'hive',
@@ -87,7 +90,8 @@ function blockchainEventsListener(){
           transaction: false,
           isProcessed: false,
           headValidator: currentValidator[0],
-          createdAt: new Date().getTime()
+          createdAt: new Date().getTime(),
+          signatures: []
         });
       }
     }
