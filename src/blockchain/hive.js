@@ -45,16 +45,16 @@ exports.buildMakeHiveInterface = ({ hive, eventEmitter, userDatabase, getUserSta
       for (const op of transaction.operations){
         let type = op[0]
         let data = op[1]
-        routeTransaction(type, data)
+        routeTransaction(type, data, transaction)
       }
     }
   }
 
-  async function routeTransaction(type, data){
+  async function routeTransaction(type, data, transaction){
     try {
       switch (type){
         case 'transfer':
-          validateTransfer(data);
+          validateTransfer(data, transaction);
           break;
         case 'custom_json':
           validateCustomJson(data);
@@ -72,7 +72,7 @@ exports.buildMakeHiveInterface = ({ hive, eventEmitter, userDatabase, getUserSta
     }
   }
 
-  function validateTransfer(data){
+  function validateTransfer(data, transaction){
     if (data.to == process.env.HIVE_DEPOSIT_ACCOUNT){
       if (!data.from || !data.to || !data.amount || !data.memo){
         throw new Error("Transfer data is required")
@@ -82,7 +82,8 @@ exports.buildMakeHiveInterface = ({ hive, eventEmitter, userDatabase, getUserSta
         to: data.to,
         amount: Number(data.amount.split(" ")[0]),
         currency: data.amount.split(" ")[1],
-        memo: data.memo
+        memo: data.memo,
+        transaction_id: transaction.transaction_id
       }
       eventEmitter.emit('hiveConversion', transferDetails)
     }

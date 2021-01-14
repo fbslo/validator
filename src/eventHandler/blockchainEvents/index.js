@@ -7,6 +7,31 @@ const { hive, ethereum } = require("../../blockchain/index.js")
 function blockchainEventsListener(){
   eventEmitter.on(`hiveDeposit`, (data) => {
     // TODO: prepare eth tx
+    let isAlreadyProcessed = await transactionDatabase.findByReferenceID(data[i].transaction_id);
+    if (!isAlreadyProcessed){
+      let currentValidator = await statusDatabase.findByName(`headValidator`)
+      if (currentValidator[0] == process.env.VALIDATOR){
+        await transactionDatabase.insert({
+          chain: 'ethereum',
+          referenceTransaction: data[i].transaction_id,
+          isProcessed: false,
+          headValidator: process.env.VALIDATOR,
+          createdAt: new Date().getTime()
+        });
+        p2p.sendEventByName('propose_transaction', {
+          chain: 'ethereum',
+          referenceTransaction: data[i].transaction_id
+        })
+      } else {
+        await transactionDatabase.insert({
+          chain: 'ethereum',
+          referenceTransaction: data[i].transaction_id,
+          isProcessed: false,
+          headValidator: currentValidator[0],
+          createdAt: new Date().getTime()
+        });
+      }
+    }
   })
 
   eventEmitter.on(`validatorVote`, (data) => {
@@ -38,23 +63,26 @@ function blockchainEventsListener(){
         let preparedTransaction = await hive.prepareTransferTransaction({
           from: process.env.HIVE_DEPOSIT_ACCOUNT,
           to: notProcessedTransactions[i].returnValues.username,
-          amount: notProcessedTransactions[i].returnValues.amount / Math.pow(10, process.env.ETHEREUM_TOKEN_PRECISION),
+          amount: notProcessedTransactions[i].returnValues.amount / Math.pow(10, process.env.TOKEN_PRECISION),
           currency: "HIVE",
           memo: `wHIVE converted`
         })
         await transactionDatabase.insert({
+          chain: 'hive',
           referenceTransaction: notProcessedTransactions[i].transactionHash,
           transaction: preparedTransaction,
           isProcessed: false,
           headValidator: process.env.VALIDATOR,
           createdAt: new Date().getTime()
         });
-        p2p.sendEventByName('requestWrappedToHiveConversionSiganture', {
+        p2p.sendEventByName('propose_transaction', {
+          chain: 'hive',
           referenceTransaction: notProcessedTransactions[i].transactionHash,
-          transaction: preparedTransaction
+          transaction: JSON.stringify(preparedTransaction)
         })
       } else {
         await transactionDatabase.insert({
+          chain: 'hive',
           referenceTransaction: notProcessedTransactions[i].transactionHash,
           transaction: false,
           isProcessed: false,
