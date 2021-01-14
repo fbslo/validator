@@ -3,7 +3,8 @@ exports.buildMakeEthereumInterface = ({ web3, eventEmitter, tokenABI, multisigAB
     streamEthereumEvents,
     getTransaction,
     decode,
-    prepareAndSignMessage
+    prepareAndSignMessage,
+    isAddress
   })
 
   async function streamEthereumEvents(){
@@ -37,5 +38,10 @@ exports.buildMakeEthereumInterface = ({ web3, eventEmitter, tokenABI, multisigAB
     let messageHash = await contractInstance.methods.getMessageHash(to, amount, referenceTransaction).call();
     let signature = await web3.eth.accounts.signUntrustedHash(messageHash, process.env.ETHEREUM_PRIVATE_KEY);
     return signature;
+  }
+
+  async function isAddress(address){
+    let isAddress = await web3.utils.isAddress(address);
+    return isAddress;
   }
 }

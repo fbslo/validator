@@ -66,7 +66,21 @@ module.exports.buildMakeValidateConversionRequest = ({ hive, ethereum, transacti
     return signedTransaction;
   }
 
-  async function validateConversionToEthereum(referenceTransaction, transaction){
-    // TODO:
+  async function validateConversionToEthereum(referenceTransaction){
+    let hiveTransaction = await hive.getTransactionByID(referenceTransaction);
+
+    if (hiveTransaction.operations[0][0] != 'transfer'){
+      throw new Error(`Transaction is not transfer`)
+    }
+    if (hiveTransaction.operations[0][1].to != process.env.HIVE_DEPOSIT_ACCOUNT){
+      throw new Error(`Recipient is not deposit account`)
+    }
+    if (!ethereum.isAddress(hiveTransaction.operations[0][1].memo)){
+      throw new Error(`Memo is not ethereum address`)
+    }
+    let to = hiveTransaction.operations[0][1].memo;
+    let amount = hiveTransaction.operations[0][1].amount.split(" ")[0] * Math.pow(10, process.env.TOKEN_PRECISION);
+    let signedTransaction = await ethereum.prepareAndSignMessage(to, amount, referenceTransaction);
+    return signedTransaction;
   }
 }

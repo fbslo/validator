@@ -17,8 +17,7 @@ Propose transaction (head validator only)
     chain: hive/ethereum,
     referenceTransaction: ref_tx,
     signature: tx_signature,
-    transaction: tx
-    transactionHash: SHA256 hash of transaction
+    proposalTransaction: proposalTransaction
   }
 }
 

@@ -9,17 +9,18 @@ async function p2pEventsListener(){
     if (data.chain == 'hive'){
       let signedTransaction = await validator(`hive`, data.referenceTransaction, data.transaction);
       p2p.sendEventByName(`signature`, {
+        chain: 'hive',
         referenceTransaction: data.referenceTransaction,
-        signature: signedTransaction.signatures[0],
-        proposalTransaction: proposalTransaction
+        proposalTransaction: proposalTransaction,
+        signature: signedTransaction.signatures[0]
       })
     } else if (data.chain == 'ethereum'){
-      // TODO: do ethereum
-      let signedTransaction = await validator(`ethereum`, data.referenceTransaction, data.transaction);
+      let signedTransaction = await validator(`ethereum`, data.referenceTransaction);
       p2p.sendEventByName(`signature`, {
+        chain: 'ethereum',
         referenceTransaction: data.referenceTransaction,
-        signature: signedTransaction.signature,
-        proposalTransaction: proposalTransaction
+        proposalTransaction: proposalTransaction,
+        signature: signedTransaction.signature
       })
     }
   })
