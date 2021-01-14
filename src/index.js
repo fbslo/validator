@@ -13,3 +13,5 @@ p2pEvents.p2pEventsListener()
 // hive.streamBlockchain()
 // ethereum.streamEthereumEvents()
 // blockchainEvents.blockchainEventsListener()
+
+ethereum.prepareAndSignMessage('0xaB8aDa86340b31c616Bf57007cfaF153F114e491', 1000, 'hello')

@@ -1,8 +1,9 @@
-exports.buildMakeEthereumInterface = ({ web3, eventEmitter, tokenABI, inputDataDecoder }) => {
+exports.buildMakeEthereumInterface = ({ web3, eventEmitter, tokenABI, multisigABI, inputDataDecoder }) => {
   return Object.freeze({
     streamEthereumEvents,
     getTransaction,
-    decode
+    decode,
+    prepareAndSignMessage
   })
 
   async function streamEthereumEvents(){
@@ -29,5 +30,13 @@ exports.buildMakeEthereumInterface = ({ web3, eventEmitter, tokenABI, inputDataD
     let decodedInput = inputDataDecoder.decodeData(input);
     // TODO: standarize output
     return decodedInput;
+  }
+
+  async function prepareAndSignMessage(to, amount, referenceTransaction){
+    let contractInstance = new web3.eth.Contract(multisigABI, process.env.MULTISIG_CONTRACT_ADDRESS);
+    let messageHash = await contractInstance.methods.getMessageHash(to, amount, referenceTransaction).call();
+    console.log(messageHash)
+    let signature = await web3.eth.accounts.sign(messageHash, process.env.ETHEREUM_PRIVATE_KEY);
+    console.log(signature)
   }
 }
