@@ -15,6 +15,12 @@ async function p2pEventsListener(){
       })
     } else if (data.chain == 'ethereum'){
       // TODO: do ethereum
+      let signedTransaction = await validator(`ethereum`, data.referenceTransaction, data.transaction);
+      p2p.sendEventByName(`signature`, {
+        referenceTransaction: data.referenceTransaction,
+        signature: signedTransaction.signature,
+        proposalTransaction: proposalTransaction
+      })
     }
   })
 
