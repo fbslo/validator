@@ -236,7 +236,7 @@ exports.buildMakeHiveInterface = ({ hive, eventEmitter, userDatabase, getUserSta
     })
   }
 
-  async function prepareTransferTransaction({ from, to, amount, currency, memo, headValidator, referenceTransaction}){
+  async function prepareTransferTransaction({ from, to, amount, currency, memo, headValidator, referenceTransaction }){
     let dhiveClient = new dhive.Client(process.env.HIVE_NODES.split(','), {
       chainId: process.env.HIVE_CHAIN_ID,
     })
@@ -291,6 +291,7 @@ exports.buildMakeHiveInterface = ({ hive, eventEmitter, userDatabase, getUserSta
       let digest = cryptoUtils.transactionDigest(msg);
       // Finding public key of the private that was used to sign
       let key = (new Signature(sig.data, sig.recovery)).recover(digest);
+      if (key.toString() == 'STM5NdUbR15D1CRW5DNChpnFz7T2rdrvZpv1W5SWZXB8CPWvWoFnH') return ['posh-bot'] //get_key_references will return [[]] for posh-bot???
       let [owner] = await dhiveClient.database.call('get_key_references', [[key]]);
       if (owner) return owner;
       else return false;

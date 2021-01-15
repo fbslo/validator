@@ -29,23 +29,23 @@ module.exports.buildMakeValidateConversionRequest = ({ hive, ethereum, transacti
     let signedTransaction = false;
     try {
       if (conversionDirection == 'hive'){
-        signedTransaction = await validateConversionToHive(referenceTransaction, proposedTransaction)
+        signedTransaction = await validateConversionToHive(referenceTransaction, proposedTransaction, headValidator)
       } else {
         signedTransaction = await validateConversionToEthereum(referenceTransaction, proposedTransaction)
       }
     } catch (e) {
       console.log(`signedTransaction failed or rejected: ${e.message}`)
-      let attempted = 0
-      if (e.message.includes('Unknown Transaction') && attempted < 3){
-        // TODO: add tx to queue to retry later
-        attempted++
-      }
+      // let attempted = 0
+      // if (e.message.includes('Unknown Transaction') && attempted < 3){
+      //   // TODO: add tx to queue to retry later
+      //   attempted++
+      // }
     }
 
     return signedTransaction;
   }
 
-  async function validateConversionToHive(referenceTransaction, transaction){
+  async function validateConversionToHive(referenceTransaction, transaction, headValidator){
     if (typeof transaction == 'string') transaction = JSON.parse(transaction)
     let ethereumTransaction = await ethereum.getTransaction(referenceTransaction);
     let decodedTransactionData = await ethereum.decode(ethereumTransaction.input)
