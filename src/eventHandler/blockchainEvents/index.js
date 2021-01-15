@@ -6,6 +6,7 @@ const { hive, ethereum } = require("../../blockchain/index.js")
 
 async function blockchainEventsListener(){
   eventEmitter.on(`hiveConversion`, async (data) => {
+    console.log(`New hive deposit from ${data.from} for ${data.amount}.`)
     let isAlreadyProcessed = await transactionDatabase.findByReferenceID(data.transaction_id);
     if (!isAlreadyProcessed){
       let currentValidator = await statusDatabase.findByName(`headValidator`)
@@ -57,7 +58,7 @@ async function blockchainEventsListener(){
       let isAlreadyProcessed = await transactionDatabase.findByReferenceID(data[i].transactionHash)
       if (!isAlreadyProcessed) notProcessedTransactions.push(data[i])
     }
-    console.log(notProcessedTransactions)
+    console.log(`${notProcessedTransactions.length} ethereum conversion transactions not processed.`)
     for (i in notProcessedTransactions){
       let currentValidator = await statusDatabase.findByName(`headValidator`)
       if (currentValidator[0].data == process.env.VALIDATOR){
