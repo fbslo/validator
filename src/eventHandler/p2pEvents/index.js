@@ -5,7 +5,10 @@ const { eventEmitter } = require("../index.js")
 const { p2p } = require("../../p2p/index.js")
 
 async function p2pEventsListener(){
+  let tx = await hive.getTransactionByID('f401c5d396924376605f2bf671dd40d37d88187e')
+  console.log(JSON.parse(JSON.parse(tx.operations[0][1].json).data))
   eventEmitter.on('propose_transaction', async (data, proposalTransaction) => {
+    console.log('new proposal', data)
     if (data.chain == 'hive'){
       let signedTransaction = await validator(`hive`, data.referenceTransaction, data.transaction);
       if (signedTransaction){
@@ -20,7 +23,6 @@ async function p2pEventsListener(){
       }
     } else if (data.chain == 'ethereum'){
       let signedTransaction = await validator(`ethereum`, data.referenceTransaction);
-      console.log(signedTransaction)
       if (signedTransaction){
         p2p.sendEventByName(`signature`, {
           chain: 'ethereum',
@@ -36,9 +38,10 @@ async function p2pEventsListener(){
 
   eventEmitter.on('signature', async (data, sender) => {
     try {
+      console.log('new signature', data)
+      await sleep(10000)
       if (data.chain == 'hive'){
         let isValidSender = false
-        data = JSON.parse(data)
         let signed = await hive.verifySignature(data.signature, data.proposalTransaction)
         for (i in signed){
           if (signed[i] == sender[0]) isValidSender = true;
@@ -84,6 +87,14 @@ async function p2pEventsListener(){
 
   eventEmitter.on('whitelist_validator', async (data) => {
     let storeNewWhitelisted = await statusDatabase.addWhitelistedValidator(data.username)
+  })
+}
+
+function sleep(ms){
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      resolve()
+    }, ms)
   })
 }
 

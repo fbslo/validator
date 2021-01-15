@@ -57,10 +57,10 @@ async function blockchainEventsListener(){
       let isAlreadyProcessed = await transactionDatabase.findByReferenceID(data[i].transactionHash)
       if (!isAlreadyProcessed) notProcessedTransactions.push(data[i])
     }
-
+    console.log(notProcessedTransactions)
     for (i in notProcessedTransactions){
       let currentValidator = await statusDatabase.findByName(`headValidator`)
-      if (currentValidator[0] == process.env.VALIDATOR){
+      if (currentValidator[0].data == process.env.VALIDATOR){
         let preparedTransaction = await hive.prepareTransferTransaction({
           from: process.env.HIVE_DEPOSIT_ACCOUNT,
           to: notProcessedTransactions[i].returnValues.username,
@@ -88,7 +88,7 @@ async function blockchainEventsListener(){
           referenceTransaction: notProcessedTransactions[i].transactionHash,
           transaction: false,
           isProcessed: false,
-          headValidator: currentValidator[0],
+          headValidator: currentValidator[0].data,
           createdAt: new Date().getTime(),
           signatures: []
         });

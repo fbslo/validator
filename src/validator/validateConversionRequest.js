@@ -34,6 +34,11 @@ module.exports.buildMakeValidateConversionRequest = ({ hive, ethereum, transacti
       }
     } catch (e) {
       console.log(`signedTransaction failed or rejected: ${e.message}`)
+      let attempted = 0
+      if (e.message.includes('Unknown Transaction') && attempted < 3){
+        // TODO: add tx to queue to retry later
+        attempted++
+      }
     }
 
     return signedTransaction;

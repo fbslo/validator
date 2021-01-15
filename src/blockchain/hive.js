@@ -190,12 +190,12 @@ exports.buildMakeHiveInterface = ({ hive, eventEmitter, userDatabase, getUserSta
 
   async function getAuthoritiesInfo(){
     let accountDetails = await hive.api('get_accounts', [[process.env.HIVE_DEPOSIT_ACCOUNT]]);
-    let weightPerAuth = account[0].active.account_auths.length > 0 ? account[0].active.account_auths[0][1] : account[0].active.key_auths[0][1]
+    let weightPerAuth = accountDetails[0].active.account_auths.length > 0 ? accountDetails[0].active.account_auths[0][1] : accountDetails[0].active.key_auths[0][1]
     return {
       threshold: accountDetails[0].active.weight_threshold,
       weightPerAuth: weightPerAuth,
       requiredSignatures: accountDetails[0].active.weight_threshold / weightPerAuth,
-      auths: account[0].active.account_auths
+      auths: accountDetails[0].active.account_auths
     }
   }
 
