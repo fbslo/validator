@@ -66,7 +66,9 @@ async function blockchainEventsListener(){
           to: notProcessedTransactions[i].returnValues.username,
           amount: notProcessedTransactions[i].returnValues.amount / Math.pow(10, process.env.TOKEN_PRECISION),
           currency: "HIVE",
-          memo: `wHIVE converted`
+          memo: `wHIVE converted`,
+          headValidator: currentValidator[0].data,
+          referenceTransaction: notProcessedTransactions[i].transactionHash
         })
         await transactionDatabase.insert({
           chain: 'hive',

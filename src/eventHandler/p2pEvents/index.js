@@ -5,12 +5,11 @@ const { eventEmitter } = require("../index.js")
 const { p2p } = require("../../p2p/index.js")
 
 async function p2pEventsListener(){
-  let tx = await hive.getTransactionByID('f401c5d396924376605f2bf671dd40d37d88187e')
-  console.log(JSON.parse(JSON.parse(tx.operations[0][1].json).data))
   eventEmitter.on('propose_transaction', async (data, proposalTransaction) => {
+    let currentValidator = await statusDatabase.findByName(`headValidator`)
     console.log('new proposal', data)
     if (data.chain == 'hive'){
-      let signedTransaction = await validator(`hive`, data.referenceTransaction, data.transaction);
+      let signedTransaction = await validator(`hive`, data.referenceTransaction, data.transaction, currentValidator[0].data);
       if (signedTransaction){
         p2p.sendEventByName(`signature`, {
           chain: 'hive',
@@ -22,7 +21,7 @@ async function p2pEventsListener(){
         console.log(`Signing failed:`, signedTransaction)
       }
     } else if (data.chain == 'ethereum'){
-      let signedTransaction = await validator(`ethereum`, data.referenceTransaction);
+      let signedTransaction = await validator(`ethereum`, data.referenceTransaction, '', currentValidator[0].data);
       if (signedTransaction){
         p2p.sendEventByName(`signature`, {
           chain: 'ethereum',
@@ -38,7 +37,7 @@ async function p2pEventsListener(){
 
   eventEmitter.on('signature', async (data, sender) => {
     try {
-      console.log('new signature', data)
+      console.log('new signature  from'+sender, data)
       await sleep(10000)
       if (data.chain == 'hive'){
         let isValidSender = false

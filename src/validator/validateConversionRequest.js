@@ -3,8 +3,9 @@ module.exports.buildMakeValidateConversionRequest = ({ hive, ethereum, transacti
     conversionDirection,
     referenceTransaction,
     proposedTransaction,
+    headValidator,
     createdOn = Date.now(),
-    updatedOn = Date.now()
+    updatedOn = Date.now(),
   ){
     if (!conversionDirection){
       throw new Error(`Conversion direction is required`)
@@ -58,7 +59,7 @@ module.exports.buildMakeValidateConversionRequest = ({ hive, ethereum, transacti
     if (transaction.operations[0][0] != 'transfer'){
       throw new Error(`Transaction operation must be transfer`)
     }
-    if (decodedTransactionData.inputs[0].toString() / Math.pow(10, process.env.ETHEREUM_TOKEN_PRECISION) != transaction.operations[0][1].amount.split(" ")[0]){
+    if (decodedTransactionData.inputs[0].toString() / Math.pow(10, process.env.ETHEREUM_TOKEN_PRECISION) * 0.995 != transaction.operations[0][1].amount.split(" ")[0]){
       throw new Error(`Amount burned must match proposed amount`)
     }
     if (transaction.operations[0][1].amount.split(" ")[1] != 'HIVE'){
@@ -66,6 +67,18 @@ module.exports.buildMakeValidateConversionRequest = ({ hive, ethereum, transacti
     }
     if (decodedTransactionData.inputs[1] != transaction.operations[0][1].to){
       throw new Error(`Address from burn transaction must match proposed recepient`)
+    }
+    if (transaction.operations.length > 2){
+      throw new Error(`Only 2 operations allowed`)
+    }
+    if (transaction.operations[1][0] != 'transfer'){
+      throw new Error(`2nd transaction operation must be transfer`)
+    }
+    if (decodedTransactionData.inputs[0].toString() / Math.pow(10, process.env.ETHEREUM_TOKEN_PRECISION) * 0.005!= transaction.operations[1][1].amount.split(" ")[0]){
+      throw new Error(`Validator fee must be 0.5%`)
+    }
+    if (transaction.operations[1][1].to != headValidator){
+      throw new Error(`Fee must be paid to head validator`)
     }
     let signedTransaction = await hive.sign(transaction);
     return signedTransaction;

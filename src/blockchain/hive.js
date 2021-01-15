@@ -236,7 +236,7 @@ exports.buildMakeHiveInterface = ({ hive, eventEmitter, userDatabase, getUserSta
     })
   }
 
-  async function prepareTransferTransaction({ from, to, amount, currency, memo}){
+  async function prepareTransferTransaction({ from, to, amount, currency, memo, headValidator, referenceTransaction}){
     let dhiveClient = new dhive.Client(process.env.HIVE_NODES.split(','), {
       chainId: process.env.HIVE_CHAIN_ID,
     })
@@ -248,10 +248,15 @@ exports.buildMakeHiveInterface = ({ hive, eventEmitter, userDatabase, getUserSta
     let expiration = new Date(Date.now() + expireTime).toISOString().slice(0, -5);
     let extensions = [];
     let operations = [['transfer',
-     {'amount': `${parseFloat(amount).toFixed(3)} ${currency}`,
+     {'amount': `${parseFloat(amount * 0.995).toFixed(3)} ${currency}`,
       'from': from,
       'memo': memo,
-      'to': to}]];
+      'to': to}],
+      ['transfer',
+       {'amount': `${parseFloat(amount * 0.005).toFixed(3)} ${currency}`,
+        'from': from,
+        'memo': `0.5% headValidator fee for ${referenceTransaction}`,
+        'to': headValidator}]];
     let tx = {
       expiration,
       extensions,
@@ -274,7 +279,7 @@ exports.buildMakeHiveInterface = ({ hive, eventEmitter, userDatabase, getUserSta
     let { cryptoUtils, Signature } = dhive
     try {
       let proposalTransaction = await getTransactionByID(proposalTransactionId)
-      let transaction = JSON.parse(proposalTransaction.operations[0][1].json).data.transaction
+      let transaction = JSON.parse(JSON.parse(JSON.parse(proposalTransaction.operations[0][1].json).data).transaction)
       let msg = {
         expiration: transaction.expiration,
         extensions: transaction.extensions,
