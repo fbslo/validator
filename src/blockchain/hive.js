@@ -56,13 +56,6 @@ exports.buildMakeHiveInterface = ({ hive, eventEmitter, userDatabase, getUserSta
         case 'custom_json':
           validateCustomJson(data);
           break;
-        case 'claim_reward_balance':
-        //case 'producer_reward':
-        //case 'withdraw_vesting':
-        case 'transfer_to_vesting':
-        case 'fill_vesting_withdraw':
-          validateStakeModifyingOperation(type, data);
-          break;
       }
     } catch (e) {
       console.log(`Error while processing HIVE transaction: ${e.toString()}`)
@@ -120,51 +113,6 @@ exports.buildMakeHiveInterface = ({ hive, eventEmitter, userDatabase, getUserSta
           break;
       }
     }
-  }
-
-  async function validateStakeModifyingOperation(type, data){
-    switch (type){
-      case 'claim_reward_balance':
-        if (users.includes(data.account)){
-          eventEmitter.emit('modifiedStake', {
-            username: data.account,
-            stakeChange: data.reward_vests.amount
-          })
-        }
-        break;
-      case 'transfer_to_vesting':
-        if (users.includes(data.to)){
-          eventEmitter.emit('modifiedStake', {
-            username: data.to,
-            stakeChange: data.amount.amount
-          })
-        }
-        break;
-      case 'withdraw_vesting':
-        if (users.includes(data.account)){
-          eventEmitter.emit('modifiedStake', {
-            username: data.account,
-            stakeChange: -data.vesting_shares.amount
-          })
-        }
-        break;
-      // NOTE: since we are not scaning virtual ops, we cannot detect power downs,
-      // so entrire stake is deducted at once at start. maybe fix in the future
-      // case 'fill_vesting_withdraw':
-      //   if (users.includes(data.from_account)){
-      //     eventEmitter.emit('modifiedStake', {
-      //       username: data.from_account,
-      //       stakeChange: -data.withdrawn.split(" ")[0]
-      //     })
-      //   }
-      //   break;
-    }
-  }
-
-  async function getUserStake(user){
-    let accounts = await hive.api('get_accounts', [[user]]);
-    let activeStake = accounts[0].vesting_shares.split(" ")[0] * Math.pow(10, 6) - accounts[0].to_withdraw
-    return activeStake > 0 ? activeStake : 0;
   }
 
   async function getTransactionByID(id){
