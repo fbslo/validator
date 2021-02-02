@@ -5,7 +5,7 @@ const { eventEmitter } = require("../index.js")
 const { p2p } = require("../../p2p/index.js")
 
 async function p2pEventsListener(){
-  eventEmitter.on('propose_transaction', async (data, proposalTransaction) => {
+  eventEmitter.on('proposed_transaction', async (data, proposalTransaction) => {
     console.log(`New proposal received on ${data.chain} for ${data.referenceTransaction}!`)
     let currentValidator = await statusDatabase.findByName(`headValidator`)
     if (data.chain == 'hive'){

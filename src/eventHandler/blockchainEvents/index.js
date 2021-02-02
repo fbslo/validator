@@ -19,7 +19,7 @@ async function blockchainEventsListener(){
           createdAt: new Date().getTime(),
           signatures: []
         });
-        p2p.sendEventByName('propose_transaction', {
+        p2p.sendEventByName('proposed_transaction', {
           chain: 'ethereum',
           referenceTransaction: data.transaction_id
         })
@@ -36,29 +36,13 @@ async function blockchainEventsListener(){
     }
   })
 
-  eventEmitter.on(`validatorVote`, (data) => {
-    // TODO: update valditaor votes
-  })
-
-  eventEmitter.on(`validatorUpdate`, (data) => {
-    // TODO: update valditator votes
-  })
-
-  eventEmitter.on(`modifiedStake`, (data) => {
-    // TODO: update modified stake
-  })
-
-  eventEmitter.on(`modifiedStake`, (data) => {
-    // TODO: update modified stake
-  })
-
   eventEmitter.on(`ethereumConversion`, async (data) => {
     let notProcessedTransactions = []
     for (i in data){
       let isAlreadyProcessed = await transactionDatabase.findByReferenceID(data[i].transactionHash)
       if (!isAlreadyProcessed) notProcessedTransactions.push(data[i])
     }
-    console.log(`${notProcessedTransactions.length} ethereum conversion transactions not processed.`)
+    console.log(`${notProcessedTransactions.length} ethereum conversion(s) transactions not processed.`)
     for (i in notProcessedTransactions){
       let currentValidator = await statusDatabase.findByName(`headValidator`)
       if (currentValidator[0].data == process.env.VALIDATOR){
@@ -80,7 +64,7 @@ async function blockchainEventsListener(){
           createdAt: new Date().getTime(),
           signatures: []
         });
-        p2p.sendEventByName('propose_transaction', {
+        p2p.sendEventByName('proposed_transaction', {
           chain: 'hive',
           referenceTransaction: notProcessedTransactions[i].transactionHash,
           transaction: JSON.stringify(preparedTransaction)

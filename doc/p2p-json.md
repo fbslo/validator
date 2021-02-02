@@ -1,7 +1,7 @@
 Propose transaction (head validator only)
 
 {
-  name: propose_transaction,
+  name: proposed_transaction,
   data: {
     chain: hive/ethereum,
     referenceTransaction: ref_tx
