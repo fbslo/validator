@@ -1,5 +1,6 @@
 Propose transaction (head validator only)
 
+```
 {
   name: proposed_transaction,
   data: {
@@ -8,9 +9,13 @@ Propose transaction (head validator only)
     transaction: tx
   }
 }
+```
 
 ---
 
+Share signature with peers.
+
+```
 {
   name: signature,
   data: {
@@ -20,9 +25,13 @@ Propose transaction (head validator only)
     proposalTransaction: proposalTransaction
   }
 }
+```
 
 ---
 
+Share network state with peers (not implemented yet).
+
+```
 {
   name: network_state
   data: {
@@ -31,9 +40,13 @@ Propose transaction (head validator only)
     validatorsHash: SHA 256 hash of stringified array of active validators by alphabetic order
   }
 }
+```
 
 ---
 
+Propose new validator to the network (not implemented yet).
+
+```
 {
   name: propose_new_validator,
   data: {
@@ -42,9 +55,13 @@ Propose transaction (head validator only)
     metedata: some other info
   }
 }
+```
 
 ---
 
+Propose validator removal to the network (not implemented yet).
+
+```
 {
   name: propose_validator_removal,
   data: {
@@ -52,12 +69,17 @@ Propose transaction (head validator only)
     reson: inactive (not signing txs)/fake signatures (not signing transactions that were approved)
   }
 }
+```
 
 ---
 
+Whitelist new validator, so it can be added after proposal (not implemented yet).
+
+```
 {
   name: whitelist_validator,
   data: {
     username: whitelisted validator username
   }
 }
+```

@@ -1,4 +1,4 @@
-Blockchain events are any transaction that happen on blockchain (and are not p2p).
+Blockchain events are any transaction that happen on blockchain (and are not part of `p2p`).
 
 This include Hive deposits and Ethereum Token deposits.
 
@@ -6,7 +6,7 @@ This include Hive deposits and Ethereum Token deposits.
 
 Event: `hiveConversion`
 
-Note: Emitted every time there is new HIVE deposit. Emited in `hive.js/validateTransfer()`
+Note: Emitted every time there is new HIVE deposit. Emited in `blockchain/hive.js/validateTransfer()`
 
 Data:
 
