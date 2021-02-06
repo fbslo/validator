@@ -83,3 +83,17 @@ Whitelist new validator, so it can be added after proposal (not implemented yet)
   }
 }
 ```
+
+---
+
+Propose kick of malicious validator. (catch not implemented yet)
+
+```
+{
+  name: kick_validator,
+  data: {
+    username: toBeRemoved[i].username,
+    strikes: toBeRemoved[i].strikes
+  }
+}
+```

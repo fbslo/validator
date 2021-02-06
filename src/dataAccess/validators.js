@@ -2,7 +2,8 @@ exports.makeValidatorsDatabase = ({ makeDatabase }) => {
   return Object.freeze({
     findAll,
     findByUsername,
-    updateByUsername,
+    updateStrikesByUsername,
+    updateStatusByUsername,
     insert,
     removeByUsername,
     findAllAddresses
@@ -20,15 +21,21 @@ exports.makeValidatorsDatabase = ({ makeDatabase }) => {
     return result;
   }
 
-  async function updateByUsername(username, data){
+  async function updateStrikesByUsername(username, data){
     const db = await makeDatabase();
-    const result = await db.collection("validators").updateOne({ username: username }, { $set: { data: data } });
+    const result = await db.collection("validators").updateOne({ username: username }, { $set: { strikes: data } });
+    return result.modifiedCount > 0 ? true : false
+  }
+
+  async function updateStatusByUsername(username, data){
+    const db = await makeDatabase();
+    const result = await db.collection("validators").updateOne({ username: username }, { $set: { enabled: data } });
     return result.modifiedCount > 0 ? true : false
   }
 
   async function insert(data){
     const db = await makeDatabase();
-    const result = await db.collection("validators").insertOne({ data });
+    const result = await db.collection("validators").insertOne(data);
     return result.modifiedCount > 0 ? true : false
   }
 
