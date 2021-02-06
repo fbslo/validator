@@ -1,11 +1,8 @@
-var users = [] //store users in memory instead of constant db calls
-
-exports.buildMakeHiveInterface = ({ hive, eventEmitter, userDatabase, getUserStake, dhive }) => {
+exports.buildMakeHiveInterface = ({ hive, eventEmitter, userDatabase, dhive }) => {
   return Object.freeze({
     streamBlockchain,
     validateTransfer,
     validateCustomJson,
-    validateStakeModifyingOperation,
     getTransactionByID,
     getBlockHash,
     getAccount,
@@ -19,10 +16,6 @@ exports.buildMakeHiveInterface = ({ hive, eventEmitter, userDatabase, getUserSta
   })
 
   async function streamBlockchain(){
-    if (users.length == 0) {
-      let usersFromDatabase = await userDatabase.findAll()
-      users = usersFromDatabase.map(user => { return user['username'] })
-    }
     hive.stream({
       on_block: routeStream,
       irreversible: process.env.ENVIRONMENT == "production" ? true : false,
@@ -84,13 +77,6 @@ exports.buildMakeHiveInterface = ({ hive, eventEmitter, userDatabase, getUserSta
       let json = JSON.parse(data.json)
       if (!json.type){
         throw new Error("JSON type is required")
-      }
-      if (!users.includes(data.required_auths[0])) {
-        users.push(data.required_auths[0])
-        userDatabase.insert({
-          username: data.required_auths[0],
-          stake: await getUserStake(data.required_auths[0])
-        })
       }
       switch (json.type){
         case 'validator_vote':

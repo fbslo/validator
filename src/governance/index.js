@@ -1,8 +1,11 @@
 const { eventEmitter } = require("../eventHandler/index.js")
 const { statusDatabase } = require("../dataAccess/index.js")
 const { hive } = require('../blockchain/index.js')
+const validators = require("./validators.js")
 
 async function listen(){
+  validators.checkValidators()
+
   console.log("Listening to governance changes...")
   eventEmitter.on(`switchHeadValidator`, async (data) => {
     let scheduleNumber = await getScheduleNumber(data.headBlock)

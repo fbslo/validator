@@ -1,6 +1,7 @@
 const { MongoClient } = require('mongodb');
 const { makeValidatorsDatabase } = require("./validators.js")
-const { makeUsersDatabase } = require("./users.js")
+// Users database is deprecated for now, since there is no governance voting
+// const { makeUsersDatabase } = require("./users.js")
 const { makeStatusDatabase } = require("./status.js")
 const { makeTransactionsDatabase } = require("./transactions.js")
 
@@ -15,11 +16,11 @@ const makeDatabase = async () => {
 }
 
 const validatorDatabase = makeValidatorsDatabase({ makeDatabase })
-const userDatabase = makeUsersDatabase({ makeDatabase })
+// const userDatabase = makeUsersDatabase({ makeDatabase })
 const statusDatabase = makeStatusDatabase({ makeDatabase })
 const transactionDatabase = makeTransactionsDatabase({ makeDatabase })
 
 module.exports.validatorDatabase = validatorDatabase
-module.exports.userDatabase = userDatabase
+// module.exports.userDatabase = userDatabase
 module.exports.statusDatabase = statusDatabase
 module.exports.transactionDatabase = transactionDatabase

@@ -7,6 +7,7 @@ const { p2p } = require("../../p2p/index.js")
 async function p2pEventsListener(){
   eventEmitter.on('proposed_transaction', async (data, proposalTransaction) => {
     console.log(`New proposal received on ${data.chain} for ${data.referenceTransaction}!`)
+    // TODO: check if tx is already stored, if not, store it
     let currentValidator = await statusDatabase.findByName(`headValidator`)
     if (data.chain == 'hive'){
       let signedTransaction = await validator(`hive`, data.referenceTransaction, data.transaction, currentValidator[0].data);

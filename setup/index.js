@@ -4,6 +4,8 @@ const { MongoClient } = require('mongodb');
 const url = process.env.MONGODB_URL
 const client = new MongoClient(url, { useNewUrlParser: true, useUnifiedTopology: true  })
 
+start()
+
 const makeDatabase = async () => {
   if (!client.isConnected()) {
     await client.connect()
@@ -32,16 +34,10 @@ async function start(){
   }
 }
 
-async function addPeers(){
-  let db = await makeDatabase()
-  let defaultPeers = defaults.defaultPeers
-  for (i in defaultPeers){
-    let store = await db.collection("validators").insertOne({
-      username: defaultPeers[i].username,
-      address: defaultPeers[i].address
-    })
-    console.log(store)
-  }
+function getHiveHistory(){
+  // TODO: get all deposits and withdrawls on Hive
 }
 
-start()
+function getEthereumHistory(){
+  // TODO: get all burn and mint events
+}
