@@ -1,4 +1,4 @@
-exports.buildMakeHiveInterface = ({ hive, eventEmitter, userDatabase, dhive }) => {
+exports.buildMakeHiveInterface = ({ hive, eventEmitter, dhive }) => {
   return Object.freeze({
     streamBlockchain,
     validateTransfer,
@@ -190,7 +190,8 @@ exports.buildMakeHiveInterface = ({ hive, eventEmitter, userDatabase, dhive }) =
        {'amount': `${parseFloat(amount * 0.005).toFixed(3)} ${currency}`,
         'from': from,
         'memo': `0.5% headValidator fee for ${referenceTransaction}`,
-        'to': headValidator}]];
+        'to': headValidator}
+      ]];
     let tx = {
       expiration,
       extensions,
