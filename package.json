@@ -15,7 +15,7 @@
   "author": "fbslo & ederaleng & ochukochris",
   "license": "ISC",
   "dependencies": {
-    "@splinterlands/hive-interface": "^2.1.4",
+    "@splinterlands/hive-interface": "^1.1.1",
     "dotenv": "^8.2.0",
     "ethereum-input-data-decoder": "^0.3.1",
     "mongodb": "^3.6.3",
