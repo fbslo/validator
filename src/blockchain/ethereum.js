@@ -34,9 +34,14 @@ exports.buildMakeEthereumInterface = ({ web3, eventEmitter, tokenABI, multisigAB
   }
 
   async function prepareAndSignMessage(to, amount, referenceTransaction){
-    let contractInstance = new web3.eth.Contract(multisigABI, process.env.MULTISIG_CONTRACT_ADDRESS);
-    let messageHash = await contractInstance.methods.getMessageHash(to, amount, referenceTransaction).call();
-    let signature = await web3.eth.accounts.signUntrustedHash(messageHash, process.env.ETHEREUM_PRIVATE_KEY);
+    let msgHash = await web3.utils.soliditySha3(to, amount, referenceTransaction, process.env.MULTISIG_CONTRACT_ADDRESS);
+    let msgParams = {
+      data: msgHash
+    }
+
+    if (!process.env.ETHEREUM_PRIVATE_KEY.startsWith('0x')) process.env.ETHEREUM_PRIVATE_KEY = '0x' + process.env.ETHEREUM_PRIVATE_KEY
+
+    let signature = await sigUtil.personalSign(ethers.utils.arrayify(process.env.ETHEREUM_PRIVATE_KEY), msgParams)
     return signature;
   }
 
