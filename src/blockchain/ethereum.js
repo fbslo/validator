@@ -1,4 +1,4 @@
-exports.buildMakeEthereumInterface = ({ web3, eventEmitter, tokenABI, multisigABI, inputDataDecoder }) => {
+exports.buildMakeEthereumInterface = ({ web3, eventEmitter, tokenABI, multisigABI, inputDataDecoder, sigUtil }) => {
   return Object.freeze({
     streamEthereumEvents,
     getTransaction,
